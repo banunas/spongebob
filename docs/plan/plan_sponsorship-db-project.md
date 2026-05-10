@@ -53,6 +53,28 @@ DB 기반 웹 애플리케이션을 설계·구현한다.
 
 > 팀원 전원 `java -version` 확인 후 17 미만이면 설치 먼저 진행할 것
 
+### 시스템 구조
+
+```mermaid
+graph LR
+    Browser["브라우저\nlocalhost:8080"]
+
+    subgraph Docker Compose
+        Spring["Spring Boot\n(:8080)\nController / Service / Repository"]
+        MariaDB["MariaDB\n(:3306)"]
+    end
+
+    Browser -->|HTTP 요청| Spring
+    Spring -->|JDBC Template\nRaw SQL| MariaDB
+    MariaDB -->|ResultSet| Spring
+    Spring -->|Thymeleaf 렌더링\nHTML 응답| Browser
+```
+
+- 브라우저 → Spring Boot(8080): HTTP 요청
+- Spring Boot → MariaDB(3306): JDBC Template으로 SQL 직접 실행
+- 두 컨테이너는 Docker Compose 내부 네트워크로 연결
+- 팀원 로컬에서 `docker compose up` 한 번으로 전체 실행
+
 ---
 
 ## 핵심 기능 목록
