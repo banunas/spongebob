@@ -20,11 +20,12 @@ git merge develop
 ```
 main
 └── develop
-    ├── feature/erd-modeling     # 전원, 1주차 ERD 설계
-    ├── feature/db-setup         # A: schema, seed, roles, docker
-    ├── feature/user-request     # B: 사용자·협찬 요청 CRUD
-    ├── feature/matching-review  # C: 워크플로우·후기
-    └── feature/stats-report     # D: 통계·리포트
+    ├── feature/db-setup         # 팀원 4: schema, seed, roles
+    ├── feature/spring-setup     # 팀원 1: 환경, 인터셉터, 예외처리
+    ├── feature/matching-review  # 팀원 1: 매칭, 후기
+    ├── feature/stats-report     # 팀원 2: 통계
+    ├── feature/request-crud     # 팀원 3: 협찬요청 CRUD
+    └── feature/thymeleaf-ui     # 팀원 3: 화면
 ```
 
 - 기능 완성 후 PR → `develop` 머지
@@ -32,30 +33,50 @@ main
 
 ---
 
-## 실행 방법
+## 로컬 개발 환경 세팅
 
-### 시작
-```bash
-docker compose up
+### 최초 1회
+
 ```
-`localhost:8080` 에서 접속
-
-### 백그라운드 실행
-```bash
-docker compose up -d
-```
-
-### 종료
-```bash
-docker compose down
-```
-
-### 로그 확인
-```bash
-docker compose logs -f
+1. MariaDB 10.6 설치 (mariadb.org)
+2. DBeaver 또는 HeidiSQL 설치
+3. DBeaver에서 localhost:3306 접속 확인
+4. sponsorship 데이터베이스 생성
+5. queries/00_schema.sql 실행
+6. queries/00_seed.sql 실행
+7. queries/00_roles.sql 실행
+8. git clone 후 IntelliJ에서 프로젝트 열기
+9. src/main/resources/application.yml 접속 정보 확인
+10. Spring Boot 실행 → localhost:8080 접속 확인
 ```
 
-> `docker-compose` (하이픈) 아닌 `docker compose` (띄어쓰기) 사용할 것 — Docker v2 기준
+### application.yml 접속 정보
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/sponsorship
+    username: root
+    password: 본인_비밀번호
+```
+
+### 매번 개발 시작할 때
+
+```
+1. MariaDB 실행 확인 (서비스 자동 실행 설정 권장)
+2. IntelliJ에서 Spring Boot 실행
+3. localhost:8080 접속
+```
+
+### schema 변경이 있을 때
+
+```sql
+DROP DATABASE sponsorship;
+CREATE DATABASE sponsorship;
+```
+이후 schema.sql → seed.sql → roles.sql 순서로 다시 실행
+
+> **Schema Freeze: 5/17(토) 이후 컬럼명·타입 변경 금지. 변경 시 팀 전원 동의 필수.**
 
 ---
 
