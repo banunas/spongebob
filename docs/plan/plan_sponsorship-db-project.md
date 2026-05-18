@@ -44,7 +44,7 @@ DB 기반 웹 애플리케이션을 설계·구현한다.
 | 항목 | 버전 | 비고 |
 |------|------|------|
 | Java | 17 | Spring Boot 3 최소 요구사항, LTS |
-| Spring Boot | 3.3.x | 현재 안정 버전 |
+| Spring Boot | 3.5.14 | 실제 생성된 버전 (Spring Initializr 기준) |
 | Build Tool | Maven | 학교 프로젝트 표준, Spring Initializr에서 선택 |
 | MariaDB | 10.6 | 윈도우 함수(RANK·LAG) 지원 확인된 버전 |
 
@@ -96,7 +96,7 @@ Repository → Service → Thymeleaf 렌더링 → 브라우저
 ### 주요 제약조건
 
 - `UNIQUE(event_id, company_id)` — 같은 행사에 같은 기업 중복 요청 불가
-- `UNIQUE(request_id, reviewer_type)` — 양측 각 1회만 후기 작성 가능
+- `UNIQUE(request_id)` — 협찬 건당 후기 1개 (학생단체만 작성)
 - `CHECK(1 <= rating <= 5)` — 평점 범위 제한
 - `created_at DEFAULT CURRENT_TIMESTAMP` — 협찬요청 생성일시 자동 기록
 
@@ -114,16 +114,20 @@ Repository → Service → Thymeleaf 렌더링 → 브라우저
 ### 기능 2 — 매칭·승인 워크플로우
 - 상태 흐름:
   ```
-  PENDING → APPROVED → DONE → REVIEWED
-         ↘ REJECTED
+  요청 등록 즉시 → APPROVED → (10초 후 자동) → DONE → REVIEWED
+                ↘ REJECTED
   ```
+- 협찬 요청 INSERT 직후 랜덤으로 APPROVED/REJECTED 결정
+- APPROVED 시 백그라운드 스레드가 10초 후 자동으로 DONE 전환 (`@Async` + `Thread.sleep(10000)`)
+- 별도 시뮬레이션 버튼·수령완료 버튼 없음
 - 잘못된 순서의 상태 변경 시 예외 처리·롤백
 - 협찬 이력 테이블(sponsorship_history)은 v2에서 추가 예정
 
 ### 기능 3 — 후기·평점
 - 상태가 DONE일 때만 후기 작성 가능 (Service 레이어에서 검증)
-- 양측 상호 평가 (학생단체 → 기업, 기업 → 학생단체)
-- 중복 후기 방지: `UNIQUE(request_id, reviewer_type)`
+- 학생단체만 후기 작성 (기업 후기 없음)
+- 중복 후기 방지: `UNIQUE(request_id)` — 협찬 건당 1개
+- 후기 작성 완료 시 status → REVIEWED 로 자동 변경 (`@Transactional` 내에서 INSERT + UPDATE 원자 처리)
 
 ### 기능 4 — 통계·리포트 (SQL 활용2 핵심)
 
@@ -147,11 +151,14 @@ ERD·모델링은 전원이 함께 진행 (평가 핵심)
 
 | 팀원 | 담당 | 주요 작업 | 평가 연결 |
 |------|------|---------|---------|
-| 팀원 1 | 환경·매칭·후기 | Spring 세팅, AuthInterceptor, GlobalExceptionHandler, MatchingController/Service/Repository, ReviewController/Service/Repository | 트랜잭션, 예외처리 |
-| 팀원 2 | 통계·리포트 | StatsController/Service/Repository, 03·04·05번 쿼리 (LAG, 가중치, 서브쿼리) | SQL 활용2 — 윈도우 함수, 서브쿼리 |
-| 팀원 3 | 화면·협찬요청 | Thymeleaf 템플릿 전체, RequestController/Service/Repository, 02번 쿼리 (DATE_FORMAT) | SQL 활용1 (CRUD, JOIN) |
-| 팀원 4 | DB 설계·기초 통계 | schema.sql, seed.sql, roles.sql, 01·06번 쿼리 (GROUP BY + RANK, CASE WHEN) | 물리적 모델링, DCL |
+| 서윤 | 환경·매칭 | Spring 세팅, GlobalExceptionHandler, SponsorshipException, MatchingController/Service/Repository, AutoDoneScheduler | 트랜잭션, 예외처리, @Async |
+| 수빈 | 협찬요청 | SponsorshipController/Service/Repository | SQL CRUD, JOIN |
+| 아영 | 행사 | EventController/Service/Repository | SQL CRUD |
+| 서아 | 후기 | ReviewController/Service/Repository | 트랜잭션, 상태 검증 |
+| 전원 | 통계 | StatsController/Service/Repository, 01~06번 쿼리 | 윈도우 함수, 서브쿼리, CASE WHEN |
+| AI | 프론트엔드 전체 | layout.html, home.html, request/\*.html, event/\*.html, review/\*.html, stats/index.html | — |
 
+> **개발 순서**: 아영(event) 먼저 완료 → 수빈(sponsorship) · 서윤(matching) 병렬 → 서아(review) → 전원(stats)
 > **Service 레이어 컨벤션**: 비즈니스 로직은 Service에, DB 접근은 Repository에만. 팀 전원 동의 필수.
 
 ### Git 브랜치 전략
@@ -159,12 +166,13 @@ ERD·모델링은 전원이 함께 진행 (평가 핵심)
 ```
 main
 └── develop
-    ├── feature/db-setup         (팀원 4: schema, seed, roles)
-    ├── feature/spring-setup     (팀원 1: 환경, 인터셉터, 예외처리)
-    ├── feature/matching-review  (팀원 1: 매칭, 후기)
-    ├── feature/stats-report     (팀원 2: 통계)
-    ├── feature/request-crud     (팀원 3: 협찬요청 CRUD)
-    └── feature/thymeleaf-ui     (팀원 3: 화면)
+    ├── feature/db-setup         (전원: schema, seed, roles)
+    ├── feature/spring-setup     (서윤: 환경, 예외처리)
+    ├── feature/event            (아영: 행사 CRUD)
+    ├── feature/sponsorship      (수빈: 협찬요청 CRUD + UI)
+    ├── feature/matching         (서윤: 상태 전이, @Async)
+    ├── feature/review           (서아: 후기 CRUD)
+    └── feature/stats            (전원: 통계 쿼리 + 화면)
 ```
 
 커밋 메시지 형식: `[기능] 작업 내용` (예: `[stats] LAG 윈도우 함수 쿼리 추가`)
@@ -174,105 +182,75 @@ main
 ## 프로젝트 구조
 
 ```
-sponsorship-db/
-├── pom.xml
+database/                               # 레포 루트
+├── docs/
+│   ├── erd/
+│   │   ├── erd_plan.md
+│   │   ├── image.png
+│   │   └── schema.dbml
+│   ├── meetings/                       # 주별 회의록
+│   └── plan/
+│       ├── plan_sponsorship-db-project.md
+│       ├── plan_roles.md
+│       ├── plan_sprint.md
+│       └── plan_uiux.md
 ├── queries/
-│   ├── README.md                   # 실행 순서 안내
-│   ├── 00_schema.sql               # DDL: 테이블·제약조건·인덱스
-│   ├── 00_seed.sql                 # 샘플 데이터 (기업 10개·협찬 50건 이상)
-│   ├── 00_roles.sql                # GRANT/REVOKE DCL
-│   └── stats/
+│   ├── 00_schema.sql                   # DDL: 테이블·제약조건·인덱스
+│   ├── 00_seed.sql                     # 샘플 데이터 (기업 10개·협찬 55건)
+│   ├── 00_roles.sql                    # GRANT/REVOKE DCL          ← 미작성 (팀원 4)
+│   └── stats/                          #                           ← 미작성 (팀원 2·4)
 │       ├── 01_top10_companies.sql
 │       ├── 02_monthly_trend_ascii.sql
 │       ├── 03_mom_growth_rate.sql
 │       ├── 04_reliability_top5.sql
 │       ├── 05_company_recommendation.sql
 │       └── 06_success_rate.sql
-├── src/main/java/com/sponsorship/
-│   ├── SponsorshipApplication.java
-│   ├── model/
-│   │   ├── StudentOrg.java
-│   │   ├── Event.java
-│   │   ├── Company.java
-│   │   ├── SponsorshipRequest.java
-│   │   └── Review.java
-│   ├── controller/
-│   │   ├── SponsorshipRequestController.java
-│   │   ├── MatchingController.java
-│   │   ├── ReviewController.java
-│   │   └── StatsController.java
-│   ├── service/
-│   │   ├── SponsorshipService.java
-│   │   ├── MatchingService.java
-│   │   ├── ReviewService.java
-│   │   └── StatsService.java
-│   ├── repository/
-│   │   ├── SponsorshipRepository.java
-│   │   ├── MatchingRepository.java
-│   │   ├── ReviewRepository.java
-│   │   └── StatsRepository.java
-│   └── common/
-│       ├── AuthInterceptor.java
-│       ├── GlobalExceptionHandler.java
-│       └── SponsorshipException.java
-└── src/main/resources/
-    ├── application.yml
-    ├── templates/
-    └── static/
+└── sponsors/                           # Spring Boot 프로젝트
+    ├── pom.xml
+    └── src/
+        ├── main/
+        │   ├── java/spongebob/sponsors/
+        │   │   ├── SponsorsApplication.java          # main() 진입점, 앱 시작
+        │   │   ├── model/                            # DB 테이블 1개 = 클래스 1개, 쿼리 결과 담는 그릇
+        │   │   │   ├── StudentOrg.java               # student_org 테이블
+        │   │   │   ├── Event.java                    # event 테이블
+        │   │   │   ├── Company.java                  # company 테이블
+        │   │   │   ├── SponsorshipRequest.java       # sponsorship_request 테이블
+        │   │   │   └── Review.java                   # review 테이블
+        │   │   ├── controller/                       # URL 요청 받아 Service 호출 후 화면 반환
+        │   │   │   ├── SponsorshipRequestController.java  # /requests (협찬요청·목록)
+        │   │   │   ├── MatchingController.java            # 상태 변경 (랜덤 APPROVED/REJECTED)
+        │   │   │   ├── ReviewController.java              # /requests/{id}/review (후기작성)
+        │   │   │   ├── StatsController.java               # /stats (통계)
+        │   │   │   └── EventController.java               # /events (행사등록·목록)
+        │   │   ├── service/                          # 비즈니스 로직 (규칙 검증)
+        │   │   │   ├── SponsorshipService.java       # 협찬요청 등록, 중복 체크
+        │   │   │   ├── MatchingService.java          # 상태 전이 검증, 트랜잭션
+        │   │   │   ├── ReviewService.java            # 후기 등록, DONE 여부 검증
+        │   │   │   ├── StatsService.java             # 통계 쿼리 6개 호출
+        │   │   │   └── EventService.java             # 행사 등록·조회
+        │   │   ├── repository/                       # SQL 직접 작성, JdbcTemplate + RowMapper
+        │   │   │   ├── SponsorshipRepository.java    # 협찬요청 CRUD
+        │   │   │   ├── MatchingRepository.java       # 상태 UPDATE
+        │   │   │   ├── ReviewRepository.java         # 후기 INSERT·SELECT
+        │   │   │   ├── StatsRepository.java          # 통계 쿼리 6개
+        │   │   │   └── EventRepository.java          # 행사 INSERT·SELECT
+        │   │   └── common/                           # 공통 처리
+        │   │       ├── GlobalExceptionHandler.java   # 에러 발생 시 에러 화면으로 통일
+        │   │       └── SponsorshipException.java     # 프로젝트 전용 예외 (잘못된 상태 전이 등)
+        │   └── resources/
+        │       ├── application.properties            # 공통 설정 (DB URL 등), Git에 올림
+        │       ├── application-local.properties      # 개인 DB 비밀번호, Git에 올리지 않음
+        │       ├── templates/                        # Thymeleaf HTML 파일
+        │       └── static/                           # CSS, JS 등 정적 파일
+        └── test/
+            └── java/spongebob/sponsors/
+                └── SponsorsApplicationTests.java
 ```
 
 ---
 
-## 4주 타임라인
-
-### 1주차 (5/11~5/17) — 설계 확정 + 환경 세팅
-
-| 작업 | 담당 | 마감 |
-|------|------|------|
-| ERD 확정 (전원) | 전원 | 5/17(토) |
-| schema.sql 초안 | 팀원 4 | 5/17(토) ← **schema freeze** |
-| Spring 프로젝트 생성 + DB 연결 확인 | 팀원 1 | 5/17(토) |
-| Spring Boot 튜토리얼 (CRUD 1개) | 전원 | 5/17(토) |
-
-**확인 포인트:** MariaDB 실행 + Spring 실행 + localhost:8080 접속 확인
-
-### 2주차 (5/18~5/24) — 기본 구현
-
-| 작업 | 담당 |
-|------|------|
-| RequestController/Service/Repository | 팀원 3 |
-| MatchingController/Service/Repository (상태 전이 기본) | 팀원 1 |
-| AuthInterceptor, GlobalExceptionHandler | 팀원 1 |
-| 00_seed.sql, 00_roles.sql | 팀원 4 |
-| 통계 쿼리 초안 (03·04·05번) | 팀원 2 |
-| 01·06번 쿼리 초안 | 팀원 4 |
-| Thymeleaf 기본 템플릿 | 팀원 3 |
-
-**확인 포인트:** 협찬요청 등록 → 목록 화면 동작 / 쿼리 4개 이상 DBeaver 실행 성공
-
-### 3주차 (5/25~5/31) — 완성 + 통합
-
-| 작업 | 담당 |
-|------|------|
-| MatchingService 트랜잭션 완성 | 팀원 1 |
-| ReviewController/Service/Repository | 팀원 1 |
-| 통계 쿼리 6개 완성 + StatsController 연결 | 팀원 2 |
-| Stats 빈 데이터 처리 ("데이터 없음" 메시지) | 팀원 2 |
-| Thymeleaf 전체 화면 연결 | 팀원 3 |
-| 인덱스 추가, roles.sql 최종 | 팀원 4 |
-
-**확인 포인트:** 협찬요청 등록 → 상태 전이 → 후기 전체 흐름 / 통계 6개 화면 출력
-
-### 4주차 (6/1~6/7) — 마무리 + 발표
-
-| 작업 | 담당 |
-|------|------|
-| 통합 테스트 + 버그 수정 | 전원 |
-| README, queries/README.md | 전원 |
-| 발표 자료 | 전원 |
-| 개인 기술 블로그 (velog) | 전원 |
-
-**확인 포인트:** 로컬에서 전체 흐름 시연 가능
+> 스프린트 상세 일정: `docs/plan/plan_sprint.md` 참조 (최종 마감 2026-06-02)
 
 ---
 
@@ -290,10 +268,10 @@ sponsorship-db/
 
 - **JPA 사용 금지**: 수업 평가가 SQL 직접 작성 능력을 보기 때문에 JDBC Template 고수
 - **model/ 패키지 필수**: JDBC Template은 쿼리 결과를 담을 POJO(RowMapper용) 필요. `model/` 패키지에 통일
-- **로그인 구현 방식**: Spring Security 없이 `HttpSession`으로 직접 세션 관리. `AuthInterceptor` 1개로 /login 제외 전체 경로 적용 — 팀원 1 담당, 컨트롤러 내 개별 세션 체크 금지
+- **사용자 고정**: 로그인 없이 커밋(이화여대 컴퓨터공학과 학생회, org_id=1) 고정. 협찬목록은 `WHERE e.org_id = 1`로 커밋 건만 표시. AuthInterceptor·세션 관리 불필요.
 - **예외 처리 전략**: `@ControllerAdvice`로 글로벌 에러 처리 통일 (`GlobalExceptionHandler.java` + `SponsorshipException.java`). 컨트롤러 내 try-catch 지양
 - **상태 전이 검증**: `MatchingService`에서 현재 상태 조회 → 전이 유효성 검증 → `@Transactional`로 status UPDATE 원자 처리. 잘못된 전이 시 `SponsorshipException` throw
-- **후기 작성 조건**: `ReviewService`에서 status = DONE 여부 검증 후 INSERT. DB 트리거 아닌 Service 레이어에서 처리
+- **후기 작성 조건**: `ReviewService`에서 status = DONE 여부 검증 후 INSERT. 후기 INSERT 성공 시 status → REVIEWED UPDATE. 두 쿼리 `@Transactional`로 묶어 원자 처리. DB 트리거 아닌 Service 레이어에서 처리
 - **협찬 이력 테이블**: v2에서 추가 예정 (상태 전이 로그 저장용)
 - **인덱스 설계**: `sponsorship_request.status`, `sponsorship_request.created_at`, `sponsorship_request.company_id`, `review.request_id` — 물리적 모델링 점수
 - **트랜잭션 격리 수준**: 상태 변경 시 `READ COMMITTED` 명시적 설정
@@ -310,10 +288,18 @@ sponsorship-db/
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
 | Outside Voice | `/codex review` | Independent 2nd opinion | 1 | issues_found | 6 findings (2 critical applied: schema freeze, seed distribution) |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 4 issues, 1 critical gap (stats 빈데이터 처리) |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 2 | CLEAR | 4 decisions resolved: 로그인(이름만), 기업거절(랜덤), review테이블(ORG만), plan문서(3항목) |
 | Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
 | DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
 
+**SCHEMA 변경 필요 (schema freeze 전 처리):**
+- `review` 테이블: `reviewer_type` 컬럼 제거, `UNIQUE(request_id, reviewer_type)` → `UNIQUE(request_id)`
+- `00_seed.sql`: COMPANY reviewer_type 후기 데이터 전체 삭제
+
+**PENDING 파일 (타임라인 이슈):**
+- `queries/00_roles.sql` — 팀원 4 담당, 2주차 마감
+- `queries/stats/` 폴더 6개 파일 — 팀원 2·4 담당, 2~3주차
+
 **UNRESOLVED:** 0
 
-**VERDICT:** ENG CLEARED — 구현 시작 가능.
+**VERDICT:** ENG CLEARED — 구현 시작 가능. schema 변경 먼저 처리할 것.
