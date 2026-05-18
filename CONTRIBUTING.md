@@ -25,7 +25,7 @@ main
     ├── feature/matching-review  # 팀원 1: 매칭, 후기
     ├── feature/stats-report     # 팀원 2: 통계
     ├── feature/request-crud     # 팀원 3: 협찬요청 CRUD
-    └── feature/thymeleaf-ui     # 팀원 3: 화면
+    └── feature/thymeleaf-ui     # AI: 화면
 ```
 
 - 기능 완성 후 PR → `develop` 머지
@@ -45,7 +45,7 @@ main
 5. queries/00_schema.sql 실행
 6. queries/00_seed.sql 실행
 7. queries/00_roles.sql 실행
-8. git clone 후 IntelliJ에서 프로젝트 열기
+8. git clone 후 vscode에서 프로젝트 열기
 9. src/main/resources/application.yml 접속 정보 확인
 10. Spring Boot 실행 → localhost:8080 접속 확인
 ```
@@ -64,7 +64,7 @@ spring:
 
 ```
 1. MariaDB 실행 확인 (서비스 자동 실행 설정 권장)
-2. IntelliJ에서 Spring Boot 실행
+2. vscode에서 Spring Boot 실행
 3. localhost:8080 접속
 ```
 
