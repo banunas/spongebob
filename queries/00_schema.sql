@@ -3,11 +3,11 @@
 --  실행 순서: 이 파일 → 00_seed.sql → 00_roles.sql
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS sponsorship
+CREATE DATABASE IF NOT EXISTS sponsors
     DEFAULT CHARACTER SET utf8mb4
     DEFAULT COLLATE utf8mb4_unicode_ci;
 
-USE sponsorship;
+USE sponsors;
 
 -- =====================================================
 --  1. 학생단체
@@ -76,16 +76,15 @@ CREATE TABLE sponsorship_request (
 --  5. 후기 (협찬요청 완료 후 양측 평가)
 -- =====================================================
 CREATE TABLE review (
-    review_id      INT          NOT NULL AUTO_INCREMENT,
-    request_id     INT          NOT NULL,
-    reviewer_type  ENUM('ORG','COMPANY') NOT NULL,
-    rating         INT          NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment        TEXT,
-    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    review_id   INT      NOT NULL AUTO_INCREMENT,
+    request_id  INT      NOT NULL,
+    rating      INT      NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment     TEXT,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (review_id),
     FOREIGN KEY (request_id) REFERENCES sponsorship_request(request_id),
 
-    UNIQUE INDEX uq_review_request_type (request_id, reviewer_type),
+    UNIQUE INDEX uq_review_request (request_id),
     INDEX idx_review_request (request_id)
 );
