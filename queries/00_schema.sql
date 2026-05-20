@@ -28,6 +28,7 @@ CREATE TABLE company (
     company_name  VARCHAR(50)   NOT NULL,
     product_name  VARCHAR(100)  NOT NULL,
     contact       VARCHAR(20),
+    password      VARCHAR(100)  NOT NULL,
 
     PRIMARY KEY (company_id)
 );
