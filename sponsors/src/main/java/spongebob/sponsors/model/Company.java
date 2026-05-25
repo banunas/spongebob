@@ -8,4 +8,5 @@ public class Company {
     private String companyName;
     private String productName;
     private String contact;
+    private String password;
 }

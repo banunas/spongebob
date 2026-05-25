@@ -1,7 +1,5 @@
 -- =====================================================
 --  협찬 매칭 시스템 - DDL
---  팀: 협찬비빔밥
---  날짜: 2026-05-17
 --  실행 순서: 이 파일 → 00_seed.sql → 00_roles.sql
 -- =====================================================
 
@@ -30,6 +28,7 @@ CREATE TABLE company (
     company_name  VARCHAR(50)   NOT NULL,
     product_name  VARCHAR(100)  NOT NULL,
     contact       VARCHAR(20),
+    password      VARCHAR(100)  NOT NULL,
 
     PRIMARY KEY (company_id)
 );

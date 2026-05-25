@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>행사 등록</title>
+</head>
+<body>
+    <h2>행사 등록</h2>
+
+    <form th:action="@{/events}" th:object="${event}" method="post">
+        <div>
+            <label>행사명</label>
+            <input type="text" th:field="*{eventName}" required>
+        </div>
+        <div>
+            <label>날짜</label>
+            <input type="date" th:field="*{eventDate}" required>
+        </div>
+        <div>
+            <label>장소</label>
+            <input type="text" th:field="*{venue}">
+        </div>
+        <div>
+            <label>예상 참여 인원</label>
+            <input type="number" th:field="*{expectedAttendees}" min="1" required>
+        </div>
+        <button type="submit">등록</button>
+        <a href="/events">취소</a>
+    </form>
+</body>
+</html>
