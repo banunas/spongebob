@@ -17,5 +17,7 @@ public class ReviewRepository {
     // 후기 등록
     public void save(Review review) {
         // TODO
+        String sql = "INSERT INTO  review (request_id, rating, comment, created_at) VALUES (?,?,?,NOW())";
+        jdbcTemplate.update(sql, review.getRequestId(), review.getRating(), review.getComment());
     }
 }

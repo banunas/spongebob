@@ -7,5 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/requests")
 public class ReviewController {
+    private final ReviewService ReviewService;
+    public ReviewController(ReviewService reviewService){
+        this.reviewService=reviewService;
+    }
+    // 후기 작성 여기는 나중에 수빈이 하고 추가 예정
 
 }
