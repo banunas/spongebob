@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>행사 상세</title>
+</head>
+<body>
+    <h2>행사 상세</h2>
+
+    <table border="1">
+        <tr>
+            <th>행사명</th>
+            <td th:text="${event.eventName}"></td>
+        </tr>
+        <tr>
+            <th>날짜</th>
+            <td th:text="${event.eventDate}"></td>
+        </tr>
+        <tr>
+            <th>장소</th>
+            <td th:text="${event.venue}"></td>
+        </tr>
+        <tr>
+            <th>예상 참여 인원</th>
+            <td th:text="${event.expectedAttendees}"></td>
+        </tr>
+    </table>
+
+    <a th:href="@{/requests/new(eventId=${event.eventId})}">이 행사에 협찬 요청하기</a>
+    <br>
+    <a href="/events">목록으로</a>
+</body>
+</html>
