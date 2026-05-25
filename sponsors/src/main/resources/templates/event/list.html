@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>행사 목록</title>
+</head>
+<body>
+    <h2>행사 목록</h2>
+    <a href="/events/new">새 행사 등록</a>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>행사명</th>
+                <th>날짜</th>
+                <th>장소</th>
+                <th>예상 참여 인원</th>
+                <th>상세</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(events)}">
+                <td colspan="5">등록된 행사가 없습니다.</td>
+            </tr>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.eventName}"></td>
+                <td th:text="${event.eventDate}"></td>
+                <td th:text="${event.venue}"></td>
+                <td th:text="${event.expectedAttendees}"></td>
+                <td><a th:href="@{/events/{id}(id=${event.eventId})}">보기</a></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
