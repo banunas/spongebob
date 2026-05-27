@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>후기 작성</title>
+</head>
+<body>
+    <h2>후기 작성</h2>
+
+    <form th:action="@{/reviews}" method="post">
+        <input type="hidden" name="requestId" th:value="${requestId}">
+        <div>
+            <label>평점 (1~5)</label>
+            <select name="rating" required>
+                <option value="5">⭐⭐⭐⭐⭐ 5점</option>
+                <option value="4">⭐⭐⭐⭐ 4점</option>
+                <option value="3">⭐⭐⭐ 3점</option>
+                <option value="2">⭐⭐ 2점</option>
+                <option value="1">⭐ 1점</option>
+            </select>
+        </div>
+        <div>
+            <label>내용</label><br>
+            <textarea name="comment" rows="5" cols="40" placeholder="후기를 입력해주세요."></textarea>
+        </div>
+        <button type="submit">등록</button>
+        <a href="/requests">취소</a>
+    </form>
+</body>
+</html>
