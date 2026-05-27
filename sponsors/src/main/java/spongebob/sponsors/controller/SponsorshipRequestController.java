@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import spongebob.sponsors.model.SponsorshipRequest;
+import spongebob.sponsors.repository.CompanyRepository;
+import spongebob.sponsors.service.EventService;
 import spongebob.sponsors.service.SponsorshipService;
 
 // 담당: 수빈
@@ -15,9 +17,15 @@ import spongebob.sponsors.service.SponsorshipService;
 public class SponsorshipRequestController {
 
     private final SponsorshipService sponsorshipService;
+    private final EventService eventService;
+    private final CompanyRepository companyRepository;
 
-    public SponsorshipRequestController(SponsorshipService sponsorshipService) {
+    public SponsorshipRequestController(SponsorshipService sponsorshipService,
+                                        EventService eventService,
+                                        CompanyRepository companyRepository) {
         this.sponsorshipService = sponsorshipService;
+        this.eventService = eventService;
+        this.companyRepository = companyRepository;
     }
 
     // 협찬요청 목록 화면
@@ -31,6 +39,8 @@ public class SponsorshipRequestController {
     @GetMapping("/new")
     public String form(Model model) {
         model.addAttribute("request", new SponsorshipRequest());
+        model.addAttribute("events", eventService.getEventsForCurrentOrg());
+        model.addAttribute("companies", companyRepository.findAll());
         return "request/form";
     }
 
