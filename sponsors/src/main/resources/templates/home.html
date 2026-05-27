@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('홈', 'home', ~{::main})}">
+<body>
+<main>
+    <h1 class="page-title">협찬 통합 관리 시스템</h1>
+    <p class="greeting">
+        안녕하세요, <strong>커밋</strong>(이화여자대학교 컴퓨터공학과 학생회)님!
+    </p>
+
+    <div class="menu-grid">
+        <a class="menu-card" href="/requests/new">
+            <div class="icon">📝</div>
+            <div class="label">협찬요청</div>
+        </a>
+        <a class="menu-card" href="/requests">
+            <div class="icon">📋</div>
+            <div class="label">협찬목록</div>
+        </a>
+        <a class="menu-card" href="/events/new">
+            <div class="icon">➕</div>
+            <div class="label">행사등록</div>
+        </a>
+        <a class="menu-card" href="/events">
+            <div class="icon">🎪</div>
+            <div class="label">행사목록</div>
+        </a>
+        <a class="menu-card" href="/stats">
+            <div class="icon">📊</div>
+            <div class="label">통계</div>
+        </a>
+    </div>
+</main>
+</body>
+</html>

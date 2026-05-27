@@ -1,33 +1,40 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>행사 상세</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('행사 상세', 'event', ~{::main})}">
 <body>
-    <h2>행사 상세</h2>
+<main>
+    <div class="toolbar">
+        <h1 class="page-title" th:text="${event.eventName}">봄 대동제</h1>
+        <a href="/events" class="btn btn-outline">목록으로</a>
+    </div>
 
-    <table border="1">
-        <tr>
-            <th>행사명</th>
-            <td th:text="${event.eventName}"></td>
-        </tr>
-        <tr>
-            <th>날짜</th>
-            <td th:text="${event.eventDate}"></td>
-        </tr>
-        <tr>
-            <th>장소</th>
-            <td th:text="${event.venue}"></td>
-        </tr>
-        <tr>
-            <th>예상 참여 인원</th>
-            <td th:text="${event.expectedAttendees}"></td>
-        </tr>
-    </table>
+    <div class="card">
+        <table class="table detail-table">
+            <tr>
+                <th>날짜</th>
+                <td th:text="${event.eventDate}">2026-03-21</td>
+            </tr>
+            <tr>
+                <th>장소</th>
+                <td th:text="${event.venue}">운동장</td>
+            </tr>
+            <tr>
+                <th>예상 참여 인원</th>
+                <td th:text="${event.expectedAttendees} + '명'">1000명</td>
+            </tr>
+        </table>
 
-    <a th:href="@{/requests/new(eventId=${event.eventId})}">이 행사에 협찬 요청하기</a>
-    <br>
-    <a href="/events">목록으로</a>
+        <div class="form-actions">
+            <a th:href="@{/requests/new(eventId=${event.eventId})}" class="btn">이 행사에 협찬 요청하기</a>
+        </div>
+    </div>
+</main>
+
+<style>
+.detail-table th {
+    width: 160px;
+    background: var(--bg);
+}
+</style>
 </body>
 </html>

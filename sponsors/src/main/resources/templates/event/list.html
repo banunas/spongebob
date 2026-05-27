@@ -1,35 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>행사 목록</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('행사목록', 'event', ~{::main})}">
 <body>
-    <h2>행사 목록</h2>
-    <a href="/events/new">새 행사 등록</a>
+<main>
+    <div class="toolbar">
+        <div>
+            <h1 class="page-title">행사목록</h1>
+            <p class="page-subtitle">커밋이 등록한 행사 내역</p>
+        </div>
+        <a class="btn" href="/events/new">+ 행사 등록하기</a>
+    </div>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>행사명</th>
-                <th>날짜</th>
-                <th>장소</th>
-                <th>예상 참여 인원</th>
-                <th>상세</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:if="${#lists.isEmpty(events)}">
-                <td colspan="5">등록된 행사가 없습니다.</td>
-            </tr>
-            <tr th:each="event : ${events}">
-                <td th:text="${event.eventName}"></td>
-                <td th:text="${event.eventDate}"></td>
-                <td th:text="${event.venue}"></td>
-                <td th:text="${event.expectedAttendees}"></td>
-                <td><a th:href="@{/events/{id}(id=${event.eventId})}">보기</a></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card" th:if="${!#lists.isEmpty(events)}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>행사명</th>
+                    <th>날짜</th>
+                    <th>장소</th>
+                    <th>예상 참여 인원</th>
+                    <th>상세</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="event : ${events}">
+                    <td th:text="${event.eventName}">봄 대동제</td>
+                    <td th:text="${event.eventDate}">2026-03-21</td>
+                    <td th:text="${event.venue}">운동장</td>
+                    <td th:text="${event.expectedAttendees}">1000</td>
+                    <td>
+                        <a th:href="@{/events/{id}(id=${event.eventId})}" class="btn btn-sm btn-outline">보기</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card empty" th:if="${#lists.isEmpty(events)}">
+        <p>등록된 행사가 없어요.</p>
+        <a class="btn" href="/events/new">+ 행사 등록하기</a>
+    </div>
+</main>
 </body>
 </html>
