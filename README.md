@@ -23,7 +23,6 @@
 
 - Java 17 이상
 - MariaDB 10.6
-- IntelliJ IDEA
 
 ### 1. DB 세팅
 
