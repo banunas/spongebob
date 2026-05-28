@@ -29,6 +29,27 @@ public class EventService {
     }
 
     public void createEvent(Event event) {
+        validate(event);
+        event.setOrgId(CURRENT_ORG_ID);
+        eventRepository.save(event);
+    }
+
+    public void updateEvent(int eventId, Event event) {
+        validate(event);
+        Event existing = getEventById(eventId);
+        existing.setEventName(event.getEventName());
+        existing.setEventDate(event.getEventDate());
+        existing.setVenue(event.getVenue());
+        existing.setExpectedAttendees(event.getExpectedAttendees());
+        eventRepository.update(existing);
+    }
+
+    public void deleteEvent(int eventId) {
+        getEventById(eventId); // 존재 확인
+        eventRepository.delete(eventId);
+    }
+
+    private void validate(Event event) {
         if (event.getEventName() == null || event.getEventName().isBlank()) {
             throw new SponsorshipException("행사명은 필수입니다.");
         }
@@ -38,7 +59,5 @@ public class EventService {
         if (event.getExpectedAttendees() <= 0) {
             throw new SponsorshipException("예상 참여 인원은 1명 이상이어야 합니다.");
         }
-        event.setOrgId(CURRENT_ORG_ID);
-        eventRepository.save(event);
     }
 }

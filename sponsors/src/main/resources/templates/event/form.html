@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout('행사등록', 'event-new', ~{::main})}">
+      th:replace="~{layout :: layout(${event.eventId != 0} ? '행사수정' : '행사등록', 'event', ~{::main})}">
 <body>
 <main>
-    <h1 class="page-title">행사등록</h1>
-    <p class="page-subtitle">새 행사 정보를 입력하세요</p>
+    <h1 class="page-title" th:text="${event.eventId != 0} ? '행사수정' : '행사등록'">행사등록</h1>
+    <p class="page-subtitle" th:text="${event.eventId != 0} ? '행사 정보를 수정하세요' : '새 행사 정보를 입력하세요'">새 행사 정보를 입력하세요</p>
 
     <div class="card">
-        <form th:action="@{/events}" th:object="${event}" method="post">
+        <form th:action="${event.eventId != 0} ? @{/events/{id}(id=${event.eventId})} : @{/events}"
+              th:object="${event}" method="post">
             <div class="form-group">
                 <label>행사이름</label>
                 <input type="text" th:field="*{eventName}" required placeholder="예: 봄 대동제">
@@ -29,8 +30,10 @@
             </div>
 
             <div class="form-actions">
-                <a href="/events" class="btn btn-outline">취소</a>
-                <button type="submit" class="btn">등록</button>
+                <a th:href="${event.eventId != 0} ? @{/events/{id}(id=${event.eventId})} : '/events'"
+                   class="btn btn-outline">취소</a>
+                <button type="submit" class="btn"
+                        th:text="${event.eventId != 0} ? '수정' : '등록'">등록</button>
             </div>
         </form>
     </div>

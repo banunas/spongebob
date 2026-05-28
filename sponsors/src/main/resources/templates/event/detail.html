@@ -26,6 +26,11 @@
 
         <div class="form-actions">
             <a th:href="@{/requests/new(eventId=${event.eventId})}" class="btn">이 행사에 협찬 요청하기</a>
+            <a th:href="@{/events/{id}/edit(id=${event.eventId})}" class="btn btn-outline">수정</a>
+            <form th:action="@{/events/{id}/delete(id=${event.eventId})}" method="post"
+                  onsubmit="return confirm('이 행사를 삭제하시겠습니까?')">
+                <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
         </div>
     </div>
 </main>
