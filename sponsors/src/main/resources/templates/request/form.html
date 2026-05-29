@@ -29,7 +29,7 @@
                     <option value="">선택하세요</option>
                     <option th:each="c : ${companies}"
                             th:value="${c.companyId}"
-                            th:text="${c.companyName + ' (' + c.productName + ')'}">도미노피자</option>
+                            th:text="${c.companyName}">도미노피자</option>
                 </select>
             </div>
 

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import spongebob.sponsors.model.Event;
 import spongebob.sponsors.service.EventService;
 
-// 담당: 아영
+// 담당: 
 @Controller
 @RequestMapping("/events")
 public class EventController {

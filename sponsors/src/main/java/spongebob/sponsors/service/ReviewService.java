@@ -31,9 +31,10 @@ public class ReviewService {
         // 3. status 검사
         switch (status) {
             case "PENDING"  -> throw new SponsorshipException("아직 승인 대기 중인 요청입니다.");
-            case "APPROVED" -> throw new SponsorshipException("협찬이 진행 중입니다. 완료 후 후기를 작성할 수 있습니다.");
+            // case "APPROVED" -> throw new SponsorshipException("협찬이 진행 중입니다. 완료 후 후기를 작성할 수 있습니다."); 
             case "REJECTED" -> throw new SponsorshipException("거절된 협찬 요청입니다.");
             case "REVIEWED" -> throw new SponsorshipException("이미 후기가 등록된 요청입니다.");
+            // ACCEPTED 상태는 예외를 던지지 않고 통과하게 됨 (자동으로 후기 작성 로직으로 진행!)
         }
 
         // 3. 후기 저장 (트리거가 자동으로 REVIEWED로 변경)

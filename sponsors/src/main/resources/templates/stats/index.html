@@ -6,7 +6,6 @@
     <h1 class="page-title">통계 리포트</h1>
     <p class="page-subtitle">협찬 현황과 트렌드를 한눈에</p>
 
-    <!-- 1. 기업별 평균 평점 TOP 10 -->
     <section class="card stats-section">
         <h2 class="stats-title">1. 기업별 평균 평점 TOP 10</h2>
         <table class="table" th:if="${!#lists.isEmpty(top10)}">
@@ -16,48 +15,25 @@
             <tbody>
                 <tr th:each="row, iter : ${top10}">
                     <td th:text="${iter.count}">1</td>
-                    <td th:text="${row.company_name}">도미노피자</td>
-                    <td th:text="${row.avg_rating}">4.8</td>
-                    <td th:text="${row.sponsorship_count}">12</td>
+                    <td th:text="${row.get('company_name') != null ? row.get('company_name') : (row.get('companyName') != null ? row.get('companyName') : (row.get('COMPANY_NAME') != null ? row.get('COMPANY_NAME') : '-'))}">도미노피자</td>
+                    <td th:text="${row.get('avg_rating') != null ? row.get('avg_rating') : (row.get('avgRating') != null ? row.get('avgRating') : (row.get('AVG_RATING') != null ? row.get('AVG_RATING') : '0.0'))}">4.8</td>
+                    <td th:text="${row.get('sponsorship_count') != null ? row.get('sponsorship_count') : (row.get('sponsorshipCount') != null ? row.get('sponsorshipCount') : (row.get('SPONSORSHIP_COUNT') != null ? row.get('SPONSORSHIP_COUNT') : '0'))}">12</td>
                 </tr>
             </tbody>
         </table>
         <p class="empty-line" th:if="${#lists.isEmpty(top10)}">데이터가 없습니다.</p>
     </section>
 
-    <!-- 2. 월별 협찬 건수 추이 -->
     <section class="card stats-section">
         <h2 class="stats-title">2. 월별 협찬 건수 추이</h2>
         <pre class="ascii-chart" th:if="${!#lists.isEmpty(monthly)}"><span th:each="row : ${monthly}"
-             th:text="${row.month + '  ' + row.bar + '  (' + row.count + '건)'} + '&#10;'"></span></pre>
+             th:text="${(row.get('month') != null ? row.get('month') : (row.get('MONTH') != null ? row.get('MONTH') : '')) + '  ' + (row.get('bar') != null ? row.get('bar') : (row.get('BAR') != null ? row.get('BAR') : '')) + '  (' + (row.get('count') != null ? row.get('count') : (row.get('COUNT') != null ? row.get('COUNT') : '0')) + '건)'} + '&#10;'"></span></pre>
         <p class="empty-line" th:if="${#lists.isEmpty(monthly)}">데이터가 없습니다.</p>
     </section>
 
-    <!-- 3. 전월 대비 증감률 -->
-    <section class="card stats-section">
-        <h2 class="stats-title">3. 전월 대비 증감률</h2>
-        <table class="table" th:if="${!#lists.isEmpty(growth)}">
-            <thead>
-                <tr><th>월</th><th>건수</th><th>전월</th><th>증감률</th></tr>
-            </thead>
-            <tbody>
-                <tr th:each="row : ${growth}">
-                    <td th:text="${row.month}">2026-04</td>
-                    <td th:text="${row.count}">15</td>
-                    <td th:text="${row.prev_count}">10</td>
-                    <td>
-                        <span th:text="${row.growth_rate} + '%'"
-                              th:classappend="${row.growth_rate >= 0} ? 'rate-up' : 'rate-down'">+50%</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <p class="empty-line" th:if="${#lists.isEmpty(growth)}">데이터가 없습니다.</p>
-    </section>
 
-    <!-- 4. 신뢰도 높은 기업 TOP 5 -->
     <section class="card stats-section">
-        <h2 class="stats-title">4. 신뢰도 높은 기업 TOP 5</h2>
+        <h2 class="stats-title">3. 신뢰도 높은 기업 TOP 5</h2>
         <p class="stats-desc">평점 × 0.6 + 건수 × 0.4 가중치</p>
         <table class="table" th:if="${!#lists.isEmpty(reliability)}">
             <thead>
@@ -66,51 +42,84 @@
             <tbody>
                 <tr th:each="row, iter : ${reliability}">
                     <td th:text="${iter.count}">1</td>
-                    <td th:text="${row.company_name}">도미노피자</td>
-                    <td th:text="${row.reliability_score}">4.7</td>
-                    <td th:text="${row.avg_rating}">4.8</td>
-                    <td th:text="${row.sponsorship_count}">12</td>
+                    <td th:text="${row.get('company_name') != null ? row.get('company_name') : (row.get('companyName') != null ? row.get('companyName') : (row.get('COMPANY_NAME') != null ? row.get('COMPANY_NAME') : '-'))}">도미노피자</td>
+                    <td th:text="${row.get('reliability_score') != null ? row.get('reliability_score') : (row.get('reliabilityScore') != null ? row.get('reliabilityScore') : (row.get('RELIABILITY_SCORE') != null ? row.get('RELIABILITY_SCORE') : '0.0'))}">4.7</td>
+                    <td th:text="${row.get('avg_rating') != null ? row.get('avg_rating') : (row.get('avgRating') != null ? row.get('avgRating') : (row.get('AVG_RATING') != null ? row.get('AVG_RATING') : '0.0'))}">4.8</td>
+                    <td th:text="${row.get('sponsorship_count') != null ? row.get('sponsorship_count') : (row.get('sponsorshipCount') != null ? row.get('sponsorshipCount') : (row.get('SPONSORSHIP_COUNT') != null ? row.get('SPONSORSHIP_COUNT') : '0'))}">12</td>
                 </tr>
             </tbody>
         </table>
         <p class="empty-line" th:if="${#lists.isEmpty(reliability)}">데이터가 없습니다.</p>
     </section>
 
-    <!-- 5. 함께 협찬한 기업 추천 -->
     <section class="card stats-section">
-        <h2 class="stats-title">5. 함께 협찬한 기업 추천</h2>
+        <h2 class="stats-title">4. 가장 자주 협업한 기업 조합 TOP 5</h2>
         <table class="table" th:if="${!#lists.isEmpty(recommendation)}">
             <thead>
-                <tr><th>기업명</th><th>함께 협찬한 횟수</th><th>평균 평점</th></tr>
+                <tr><th>기업 A</th><th>기업 B</th><th>함께 협찬한 횟수</th></tr>
             </thead>
             <tbody>
                 <tr th:each="row : ${recommendation}">
-                    <td th:text="${row.company_name}">CJ제일제당</td>
-                    <td th:text="${row.co_sponsor_count}">3</td>
-                    <td th:text="${row.avg_rating}">4.5</td>
+                    <td th:text="${row.get('company_name')}">도미노피자</td>
+                    <td th:text="${row.get('co_sponsor_company') != null ? row.get('co_sponsor_company') : '-'}">CJ제일제당</td>
+                    <td th:text="${(row.get('co_sponsor_count') != null ? row.get('co_sponsor_count') : '0') + '회'}">3회</td>
                 </tr>
             </tbody>
         </table>
         <p class="empty-line" th:if="${#lists.isEmpty(recommendation)}">데이터가 없습니다.</p>
     </section>
 
-    <!-- 6. 기업별 협찬 성사율 -->
     <section class="card stats-section">
-        <h2 class="stats-title">6. 기업별 협찬 성사율</h2>
+        <h2 class="stats-title">5. 기업별 협찬 성사율</h2>
         <table class="table" th:if="${!#lists.isEmpty(successRate)}">
             <thead>
                 <tr><th>기업명</th><th>전체 요청</th><th>승인</th><th>성사율</th></tr>
             </thead>
             <tbody>
                 <tr th:each="row : ${successRate}">
-                    <td th:text="${row.company_name}">도미노피자</td>
-                    <td th:text="${row.total_requests}">20</td>
-                    <td th:text="${row.approved_count}">15</td>
-                    <td th:text="${row.success_rate} + '%'">75%</td>
+                    <td th:text="${row.get('company_name') != null ? row.get('company_name') : (row.get('companyName') != null ? row.get('companyName') : (row.get('COMPANY_NAME') != null ? row.get('COMPANY_NAME') : '-'))}">도미노피자</td>
+                    <td th:text="${row.get('total_requests') != null ? row.get('total_requests') : (row.get('totalRequests') != null ? row.get('totalRequests') : (row.get('TOTAL_REQUESTS') != null ? row.get('TOTAL_REQUESTS') : '0'))}">20</td>
+                    <td th:text="${row.get('approved_count') != null ? row.get('approved_count') : (row.get('approvedCount') != null ? row.get('approvedCount') : (row.get('APPROVED_COUNT') != null ? row.get('APPROVED_COUNT') : '0'))}">15</td>
+                    <td th:text="${(row.get('success_rate') != null ? row.get('success_rate') : (row.get('successRate') != null ? row.get('successRate') : (row.get('SUCCESS_RATE') != null ? row.get('SUCCESS_RATE') : '0'))) + '%'}">75%</td>
                 </tr>
             </tbody>
         </table>
         <p class="empty-line" th:if="${#lists.isEmpty(successRate)}">데이터가 없습니다.</p>
+    </section>
+
+    <section class="card stats-section">
+        <h2 class="stats-title">6. 기업별 평점 분포 및 별점 차트</h2>
+        <table class="table" th:if="${!#lists.isEmpty(ratingDistribution)}">
+            <thead>
+                <tr><th>기업명</th><th>평균 평점</th><th>시각화 차트</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${ratingDistribution}">
+                    <td th:text="${row.get('company_name') != null ? row.get('company_name') : (row.get('companyName') != null ? row.get('companyName') : (row.get('COMPANY_NAME') != null ? row.get('COMPANY_NAME') : '-'))}">도미노피자</td>
+                    <td th:text="${row.get('avg_rating') != null ? row.get('avg_rating') : (row.get('avgRating') != null ? row.get('avgRating') : (row.get('AVG_RATING') != null ? row.get('AVG_RATING') : '0.00'))}">4.00</td>
+                    <td th:text="${row.get('bar') != null ? row.get('bar') : (row.get('BAR') != null ? row.get('BAR') : '')}" style="color: #ffc107; font-family: monospace;">★★★★</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="empty-line" th:if="${#lists.isEmpty(ratingDistribution)}">데이터가 없습니다.</p>
+    </section>
+
+    <section class="card stats-section">
+        <h2 class="stats-title">7. 일정 리뷰 수 이상인 기업 필터링</h2>
+        <table class="table" th:if="${!#lists.isEmpty(reviewCountFiltering)}">
+            <thead>
+                <tr><th>기업 ID</th><th>기업명</th><th>리뷰 건수</th><th>평균 평점</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${reviewCountFiltering}">
+                    <td th:text="${row.get('company_id') != null ? row.get('company_id') : (row.get('companyId') != null ? row.get('companyId') : (row.get('COMPANY_ID') != null ? row.get('COMPANY_ID') : '-'))}">1</td>
+                    <td th:text="${row.get('company_name') != null ? row.get('company_name') : (row.get('companyName') != null ? row.get('companyName') : (row.get('COMPANY_NAME') != null ? row.get('COMPANY_NAME') : '-'))}">카카오</td>
+                    <td th:text="${row.get('review_count') != null ? row.get('review_count') : (row.get('reviewCount') != null ? row.get('reviewCount') : (row.get('REVIEW_COUNT') != null ? row.get('REVIEW_COUNT') : '0'))}">3</td>
+                    <td th:text="${row.get('avg_rating') != null ? row.get('avg_rating') : (row.get('avgRating') != null ? row.get('avgRating') : (row.get('AVG_RATING') != null ? row.get('AVG_RATING') : '0.00'))}">4.50</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="empty-line" th:if="${#lists.isEmpty(reviewCountFiltering)}">데이터가 없습니다.</p>
     </section>
 </main>
 
