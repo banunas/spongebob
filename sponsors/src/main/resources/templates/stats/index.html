@@ -28,9 +28,26 @@
     <pre th:if="${!#lists.isEmpty(monthly)}"><span th:each="row : ${monthly}"
          th:text="${(row.get('month') != null ? row.get('month') : (row.get('MONTH') != null ? row.get('MONTH') : '')) + '  ' + (row.get('bar') != null ? row.get('bar') : (row.get('BAR') != null ? row.get('BAR') : '')) + '  (' + (row.get('count') != null ? row.get('count') : (row.get('COUNT') != null ? row.get('COUNT') : '0')) + '건)'} + '&#10;'"></span></pre>
     <p th:if="${#lists.isEmpty(monthly)}">데이터가 없습니다.</p>
+    
+    <h2>3. 전월 대비 협찬 증감률</h2>
+    <table th:if="${!#lists.isEmpty(growth)}">
+        <thead>
+            <tr><th>월</th><th>이번달 건수</th><th>전월 건수</th><th>건수 차이</th><th>증감률</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="row : ${growth}">
+                <td th:text="${row.get('월')}">2026-01</td>
+                <td th:text="${row.get('이번달_건수')}">10</td>
+                <td th:text="${row.get('전월_건수')}">8</td>
+                <td th:text="${row.get('건수 차이')}">2</td>
+                <td th:text="${row.get('증감률') != null ? row.get('증감률') + '%' : '-'}">25%</td>
+            </tr>
+        </tbody>
+    </table>
+    <p th:if="${#lists.isEmpty(growth)}">데이터가 없습니다.</p>
 
-    <!-- 3 -->
-    <h2>3. 신뢰도 높은 기업 TOP 5</h2>
+    <!-- 4 -->
+    <h2>4. 신뢰도 높은 기업 TOP 5</h2>
     <p>평점 × 0.6 + 건수 × 0.4 가중치</p>
     <table th:if="${!#lists.isEmpty(reliability)}">
         <thead>
@@ -48,8 +65,8 @@
     </table>
     <p th:if="${#lists.isEmpty(reliability)}">데이터가 없습니다.</p>
 
-    <!-- 4 -->
-    <h2>4. 가장 자주 협업한 기업 조합 TOP 5</h2>
+    <!-- 5 -->
+    <h2>5. 가장 자주 협업한 기업 조합 TOP 5</h2>
     <table th:if="${!#lists.isEmpty(recommendation)}">
         <thead>
             <tr><th>기업 A</th><th>기업 B</th><th>함께 협찬한 횟수</th></tr>
@@ -64,8 +81,8 @@
     </table>
     <p th:if="${#lists.isEmpty(recommendation)}">데이터가 없습니다.</p>
 
-    <!-- 5 -->
-    <h2>5. 기업별 협찬 성사율</h2>
+    <!-- 6 -->
+    <h2>6. 기업별 협찬 성사율</h2>
     <table th:if="${!#lists.isEmpty(successRate)}">
         <thead>
             <tr><th>기업명</th><th>전체 요청</th><th>승인</th><th>성사율</th></tr>
@@ -81,8 +98,8 @@
     </table>
     <p th:if="${#lists.isEmpty(successRate)}">데이터가 없습니다.</p>
 
-    <!-- 6 -->
-    <h2>6. 기업별 평점 분포 및 별점 차트</h2>
+    <!-- 7 -->
+    <h2>7. 기업별 평점 분포 및 별점 차트</h2>
     <table th:if="${!#lists.isEmpty(ratingDistribution)}">
         <thead>
             <tr><th>기업명</th><th>평균 평점</th><th>시각화 차트</th></tr>
@@ -97,8 +114,8 @@
     </table>
     <p th:if="${#lists.isEmpty(ratingDistribution)}">데이터가 없습니다.</p>
 
-    <!-- 7 -->
-    <h2>7. 일정 리뷰 수 이상인 기업 필터링</h2>
+    <!-- 8 -->
+    <h2>8. 일정 리뷰 수 이상인 기업 필터링</h2>
     <table th:if="${!#lists.isEmpty(reviewCountFiltering)}">
         <thead>
             <tr><th>기업 ID</th><th>기업명</th><th>리뷰 건수</th><th>평균 평점</th></tr>
