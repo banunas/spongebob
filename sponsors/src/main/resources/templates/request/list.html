@@ -3,63 +3,48 @@
       th:replace="~{layout :: layout('협찬목록', 'request', ~{::main})}">
 <body>
 <main>
-    <div class="toolbar">
-        <div>
-            <h1 class="page-title">협찬목록</h1>
-            <p class="page-subtitle">커밋이 보낸 협찬 요청 내역</p>
-        </div>
-        <a class="btn" href="/requests/new">+ 협찬 요청하기</a>
-    </div>
+    <h1>협찬목록</h1>
+    <p>커밋이 보낸 협찬 요청 내역</p>
+    <p><a href="/requests/new">+ 협찬 요청하기</a></p>
 
-    <div class="card" th:if="${!#lists.isEmpty(requests)}">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>학생단체</th>
-                    <th>기업명</th>
-                    <th>행사</th>
-                    <th>수량</th>
-                    <th>협찬상태</th>
-                    <th>후기</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="r : ${requests}">
-                    <td>커밋</td>
-                    <td th:text="${r.companyName}">도미노피자</td>
-                    <td th:text="${r.eventName}">봄 대동제</td>
-                    <td th:text="${r.quantity}">20</td>
-                    
-                    <td>
-                        <span th:switch="${r.status}">
-                            <span th:case="null"          class="badge badge-pending">대기중</span>
-                            <span th:case="'PENDING'"     class="badge badge-pending">대기중</span>
-                            <span th:case="'ACCEPTED'"    class="badge badge-approved">승인</span>
-                            <span th:case="'REJECTED'"    class="badge badge-rejected">거절</span>
-                            <span th:case="'DONE'"        class="badge badge-done">완료</span>
-                            <span th:case="'REVIEWED'"    class="badge badge-reviewed">후기완료</span>
-                        </span>
-                    </td>
-                    
-                    <td>
-                        <a th:if="${r.status == 'ACCEPTED' or r.status == 'DONE'}" 
-                           th:href="@{/reviews/new(requestId=${r.requestId})}"
-                           class="btn btn-sm btn-outline">후기작성</a>
-                        
-                        <span th:if="${r.status == 'REVIEWED'}" class="btn btn-sm btn-disabled">작성완료</span>
-                        
-                        <span th:if="${r.status == 'PENDING' or r.status == null or r.status == 'APPROVED'}" 
-                              class="btn btn-sm btn-disabled">대기</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table th:if="${!#lists.isEmpty(requests)}">
+        <thead>
+            <tr>
+                <th>학생단체</th>
+                <th>기업명</th>
+                <th>행사</th>
+                <th>수량</th>
+                <th>협찬상태</th>
+                <th>후기</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="r : ${requests}">
+                <td>커밋</td>
+                <td th:text="${r.companyName}">도미노피자</td>
+                <td th:text="${r.eventName}">봄 대동제</td>
+                <td th:text="${r.quantity}">20</td>
+                <td>
+                    <span th:switch="${r.status}">
+                        <span th:case="null">대기중</span>
+                        <span th:case="'PENDING'">대기중</span>
+                        <span th:case="'ACCEPTED'">승인</span>
+                        <span th:case="'REJECTED'">거절</span>
+                        <span th:case="'DONE'">완료</span>
+                        <span th:case="'REVIEWED'">후기완료</span>
+                    </span>
+                </td>
+                <td>
+                    <a th:if="${r.status == 'ACCEPTED' or r.status == 'DONE'}"
+                       th:href="@{/reviews/new(requestId=${r.requestId})}">후기작성</a>
+                    <span th:if="${r.status == 'REVIEWED'}">작성완료</span>
+                    <span th:if="${r.status == 'PENDING' or r.status == null or r.status == 'APPROVED'}">-</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <div class="card empty" th:if="${#lists.isEmpty(requests)}">
-        <p>등록된 협찬 요청이 없어요.</p>
-        <a class="btn" href="/requests/new">+ 협찬 요청하기</a>
-    </div>
+    <p th:if="${#lists.isEmpty(requests)}">등록된 협찬 요청이 없어요.</p>
 </main>
 </body>
 </html>

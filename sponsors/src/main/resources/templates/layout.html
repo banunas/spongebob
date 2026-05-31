@@ -3,27 +3,32 @@
       th:fragment="layout(title, active, content)">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${title} + ' | 협찬 통합 관리 시스템'">협찬 통합 관리 시스템</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+            color: black;
+            background: white;
+        }
+        a { color: #1d7923; }
+        table { border-collapse: collapse; margin: 12px 0; }
+        th, td { border: 1px solid black; padding: 6px 12px; text-align: left; }
+        nav a { margin-right: 14px; text-decoration: none; }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-inner">
-            <a class="brand" href="/">협찬 통합 관리 시스템</a>
-            <nav class="nav">
-                <a href="/"          th:classappend="${active=='home'}     ? 'active'">홈</a>
-                <a href="/requests/new" th:classappend="${active=='request-new'} ? 'active'">협찬요청</a>
-                <a href="/requests"  th:classappend="${active=='request'}  ? 'active'">협찬목록</a>
-                <a href="/events/new"   th:classappend="${active=='event-new'}   ? 'active'">행사등록</a>
-                <a href="/events"    th:classappend="${active=='event'}    ? 'active'">행사목록</a>
-                <a href="/stats"     th:classappend="${active=='stats'}    ? 'active'">통계</a>
-            </nav>
-        </div>
-    </header>
+    <nav>
+        <a href="/">홈</a>
+        <a href="/requests/new">협찬요청</a>
+        <a href="/requests">협찬목록</a>
+        <a href="/events/new">행사등록</a>
+        <a href="/events">행사목록</a>
+        <a href="/stats">통계</a>
+    </nav>
 
-    <main class="container">
-        <div th:replace="${content}"></div>
-    </main>
+    <div th:replace="${content}"></div>
 </body>
 </html>

@@ -3,47 +3,41 @@
       th:replace="~{layout :: layout('협찬요청', 'request-new', ~{::main})}">
 <body>
 <main>
-    <h1 class="page-title">협찬요청</h1>
-    <p class="page-subtitle">행사와 기업을 선택해 협찬을 요청하세요</p>
+    <h1>협찬요청</h1>
+    <p>행사와 기업을 선택해 협찬을 요청하세요.</p>
 
-    <div class="card">
-        <form th:action="@{/requests}" th:object="${request}" method="post">
-            <div class="form-group">
-                <label>학생단체</label>
-                <input type="text" value="이화여대 컴퓨터공학과 학생회 (커밋)" disabled>
-            </div>
-
-            <div class="form-group">
-                <label>행사</label>
-                <select th:field="*{eventId}" required>
-                    <option value="">선택하세요</option>
-                    <option th:each="e : ${events}"
-                            th:value="${e.eventId}"
-                            th:text="${e.eventName}">봄 대동제</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>기업</label>
-                <select th:field="*{companyId}" required>
-                    <option value="">선택하세요</option>
-                    <option th:each="c : ${companies}"
-                            th:value="${c.companyId}"
-                            th:text="${c.companyName}">도미노피자</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>수량</label>
-                <input type="number" th:field="*{quantity}" min="1" required placeholder="예: 20">
-            </div>
-
-            <div class="form-actions">
-                <a href="/requests" class="btn btn-outline">취소</a>
-                <button type="submit" class="btn">요청</button>
-            </div>
-        </form>
-    </div>
+    <form th:action="@{/requests}" th:object="${request}" method="post">
+        <p>
+            학생단체:
+            <input type="text" value="이화여대 컴퓨터공학과 학생회 (커밋)" disabled>
+        </p>
+        <p>
+            행사:
+            <select th:field="*{eventId}" required>
+                <option value="">선택하세요</option>
+                <option th:each="e : ${events}"
+                        th:value="${e.eventId}"
+                        th:text="${e.eventName}">봄 대동제</option>
+            </select>
+        </p>
+        <p>
+            기업:
+            <select th:field="*{companyId}" required>
+                <option value="">선택하세요</option>
+                <option th:each="c : ${companies}"
+                        th:value="${c.companyId}"
+                        th:text="${c.companyName}">도미노피자</option>
+            </select>
+        </p>
+        <p>
+            수량:
+            <input type="number" th:field="*{quantity}" min="1" required>
+        </p>
+        <p>
+            <button type="submit">요청</button>
+            <a href="/requests">취소</a>
+        </p>
+    </form>
 </main>
 </body>
 </html>
