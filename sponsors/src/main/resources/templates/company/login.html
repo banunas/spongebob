@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('기업 로그인', '', ~{::main})}">
+<body>
+<main>
+    <h1 class="page-title">기업 로그인</h1>
+    <p class="page-subtitle">기업 ID와 비밀번호를 입력하세요</p>
+
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
+
+        <!-- TODO: 로그인 실패 시 error 메시지 표시 -->
+        <!-- th:if="${error}" 로 조건부 출력 -->
+        <!-- <p class="error-msg" th:if="${error}" th:text="${error}"></p> -->
+
+        <form action="/company/login" method="post">
+            <div class="form-group">
+                <label>기업 ID</label>
+                <!-- TODO: companyId 입력 필드 (type="number", name="companyId") -->
+            </div>
+
+            <div class="form-group">
+                <label>비밀번호</label>
+                <!-- TODO: password 입력 필드 (type="password", name="password") -->
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn" style="width: 100%;">로그인</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<style>
+.error-msg {
+    color: var(--danger);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+</style>
+</body>
+</html>

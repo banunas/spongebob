@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('협찬요청 관리', '', ~{::main})}">
+<body>
+<main>
+    <div class="toolbar">
+        <div>
+            <h1 class="page-title">협찬요청 관리</h1>
+            <!-- TODO: companyName 세션값을 subtitle 에 표시 -->
+            <!-- <p class="page-subtitle" th:text="${companyName} + ' 으로 온 요청'"></p> -->
+        </div>
+        <!-- 로그아웃 버튼 -->
+        <form action="/company/logout" method="post">
+            <button type="submit" class="btn btn-outline">로그아웃</button>
+        </form>
+    </div>
+
+    <div class="card" th:if="${!#lists.isEmpty(requests)}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>행사명</th>
+                    <th>수량</th>
+                    <th>요청일</th>
+                    <th>상태</th>
+                    <th>처리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- TODO: th:each 로 requests 순회 -->
+                <!-- <tr th:each="req : ${requests}"> -->
+                <tr>
+                    <!-- TODO: 각 셀에 req.eventName, req.quantity, req.createdAt, req.status 바인딩 -->
+                    <td>행사명</td>
+                    <td>수량</td>
+                    <td>요청일</td>
+                    <td>
+                        <!-- TODO: 상태 뱃지 — badge-pending / badge-approved / badge-rejected 클래스 조건부 적용 -->
+                        <!-- th:classappend="${req.status == 'PENDING'} ? 'badge-pending'" 식으로 처리 -->
+                        <span class="badge">상태</span>
+                    </td>
+                    <td>
+                        <!-- TODO: status == 'PENDING' 일 때만 버튼 표시 (th:if) -->
+                        <!-- 승인 버튼: POST /company/requests/{req.requestId}/approve -->
+                        <!-- 거절 버튼: POST /company/requests/{req.requestId}/reject -->
+                        <form style="display:inline">
+                            <button type="submit" class="btn btn-sm">승인</button>
+                        </form>
+                        <form style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-outline">거절</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card empty" th:if="${#lists.isEmpty(requests)}">
+        <p>아직 들어온 협찬요청이 없어요.</p>
+    </div>
+</main>
+</body>
+</html>
