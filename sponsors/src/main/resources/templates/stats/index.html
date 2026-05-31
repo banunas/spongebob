@@ -25,8 +25,17 @@
 
     <!-- 2 -->
     <h2>2. 월별 협찬 건수 추이</h2>
-    <pre th:if="${!#lists.isEmpty(monthly)}"><span th:each="row : ${monthly}"
-         th:text="${(row.get('month') != null ? row.get('month') : (row.get('MONTH') != null ? row.get('MONTH') : '')) + '  ' + (row.get('bar') != null ? row.get('bar') : (row.get('BAR') != null ? row.get('BAR') : '')) + '  (' + (row.get('count') != null ? row.get('count') : (row.get('COUNT') != null ? row.get('COUNT') : '0')) + '건)'} + '&#10;'"></span></pre>
+    <table th:if="${!#lists.isEmpty(monthly)}">
+        <thead>
+            <tr><th>월</th><th>협찬 건수</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="row : ${monthly}">
+                <td th:text="${row.get('월')}">2026-01</td>
+                <td th:text="${row.get('협찬 건수')}">10</td>
+            </tr>
+        </tbody>
+    </table>
     <p th:if="${#lists.isEmpty(monthly)}">데이터가 없습니다.</p>
     
     <h2>3. 전월 대비 협찬 증감률</h2>

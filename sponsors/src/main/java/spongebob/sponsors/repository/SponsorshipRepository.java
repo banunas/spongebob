@@ -45,7 +45,7 @@ public class SponsorshipRepository {
                 request.getCompanyId(),
                 request.getQuantity());
     }
-    // 💡 기업 ID로 요청 목록을 조회하는 메서드 추가
+    // 기업 ID로 요청 목록 조회
     public List<SponsorshipRequestView> findByCompanyId(Long companyId) {
         String sql = """
                 SELECT sr.request_id, 

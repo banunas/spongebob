@@ -1,5 +1,5 @@
 -- 담당: 팀원 2·4
--- 기업별 협찬 성사율
+-- 기업별 협찬 성사율(국내기업만)
 -- 사용 기법: CASE WHEN + GROUP BY
 SELECT 
     c.company_id,
@@ -14,5 +14,6 @@ SELECT
     , 1) AS `success_rate`
 FROM company c
 JOIN sponsorship_request sr ON sr.company_id = c.company_id
+WHERE c.company_name != CONVERT(c.company_name USING ascii)
 GROUP BY c.company_id, c.company_name
 ORDER BY `success_rate` DESC, `total_requests` DESC;
