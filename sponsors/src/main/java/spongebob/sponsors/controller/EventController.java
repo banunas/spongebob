@@ -40,4 +40,22 @@ public class EventController {
         model.addAttribute("event", eventService.getEventById(id));
         return "event/detail";
     }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable int id, Model model) {
+        model.addAttribute("event", eventService.getEventById(id));
+        return "event/form";
+    }
+
+    @PostMapping("/{id}")
+    public String update(@PathVariable int id, @ModelAttribute Event event) {
+        eventService.updateEvent(id, event);
+        return "redirect:/events/" + id;
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable int id) {
+        eventService.deleteEvent(id);
+        return "redirect:/events";
+    }
 }

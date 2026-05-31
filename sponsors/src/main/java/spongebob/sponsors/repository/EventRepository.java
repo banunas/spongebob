@@ -47,4 +47,20 @@ public class EventRepository {
                 event.getVenue(),
                 event.getExpectedAttendees());
     }
+
+    public void update(Event event) {
+        String sql = "UPDATE event SET event_name = ?, event_date = ?, venue = ?, expected_attendees = ? " +
+                     "WHERE event_id = ?";
+        jdbcTemplate.update(sql,
+                event.getEventName(),
+                event.getEventDate(),
+                event.getVenue(),
+                event.getExpectedAttendees(),
+                event.getEventId());
+    }
+
+    public void delete(int eventId) {
+        String sql = "DELETE FROM event WHERE event_id = ?";
+        jdbcTemplate.update(sql, eventId);
+    }
 }

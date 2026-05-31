@@ -25,7 +25,6 @@ public class StatsRepository {
 
     private String loadSql(String fileName) {
         try {
-            // src/main/resources/queries/stats/ 폴더 안의 파일을 읽어옵니다.
             Resource resource = resourceLoader.getResource("classpath:queries/stats/" + fileName);
             return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -42,7 +41,8 @@ public class StatsRepository {
     // 02: 월별 협찬 건수 ASCII 바차트 (DATE_FORMAT + REPEAT)
     public List<Map<String, Object>> findMonthlyTrend() {
         String sql = loadSql("02_monthly_trend_ascii.sql");
-        return jdbcTemplate.queryForList(sql);    }
+        return jdbcTemplate.queryForList(sql);
+    }
 
     // 03: 전월 대비 증감률 (LAG)
     public List<Map<String, Object>> findMomGrowthRate() {
@@ -50,7 +50,7 @@ public class StatsRepository {
         return jdbcTemplate.queryForList(sql);
     }
 
-    // 04: 신뢰도 높은 기업 TOP 5 (가중치)
+    // 04: 신뢰도 높은 기업 TOP 5 (평점×0.6 + 건수×0.4 가중치)
     public List<Map<String, Object>> findReliabilityTop5() {
         String sql = loadSql("04_reliability_top5.sql");
         return jdbcTemplate.queryForList(sql);
@@ -67,6 +67,7 @@ public class StatsRepository {
         String sql = loadSql("06_success_rate.sql");
         return jdbcTemplate.queryForList(sql);
     }
+
     // 07: 기업별 평점 분포 및 별점 차트 (AVG + REPEAT)
     public List<Map<String, Object>> findRatingDistribution() {
         String sql = loadSql("07_rating_distribution.sql");
