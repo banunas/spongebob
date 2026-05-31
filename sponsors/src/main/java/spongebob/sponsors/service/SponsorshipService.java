@@ -27,6 +27,9 @@ public class SponsorshipService {
 
     // 협찬요청 등록
     public void register(SponsorshipRequest request) {
+        // 저장하기 전에 상태를 "PENDING"으로 강제 설정!
+        request.setStatus("PENDING"); 
         sponsorshipRepository.save(request);
     }
+   
 }

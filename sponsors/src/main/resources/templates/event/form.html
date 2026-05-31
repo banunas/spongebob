@@ -3,8 +3,8 @@
       th:replace="~{layout :: layout(${event.eventId != 0} ? '행사수정' : '행사등록', 'event', ~{::main})}">
 <body>
 <main>
-    <h1 class="page-title" th:text="${event.eventId != 0} ? '행사수정' : '행사등록'">행사등록</h1>
-    <p class="page-subtitle" th:text="${event.eventId != 0} ? '행사 정보를 수정하세요' : '새 행사 정보를 입력하세요'">새 행사 정보를 입력하세요</p>
+    <h1>행사등록</h1>
+    <p>새 행사 정보를 입력하세요.</p>
 
     <div class="card">
         <form th:action="${event.eventId != 0} ? @{/events/{id}(id=${event.eventId})} : @{/events}"

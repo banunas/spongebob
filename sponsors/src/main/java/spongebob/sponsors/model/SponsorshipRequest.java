@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class SponsorshipRequest {
-    private int requestId;
-    private int eventId;
-    private int companyId;
+    private Integer requestId;
+    private Long eventId;
+    private Long companyId;
     private String status;
-    private int quantity;
+    private Integer quantity;
     private LocalDateTime createdAt;
 }
+
+

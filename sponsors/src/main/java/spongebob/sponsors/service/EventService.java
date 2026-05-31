@@ -7,7 +7,7 @@ import spongebob.sponsors.repository.EventRepository;
 
 import java.util.List;
 
-// 담당: 아영
+// 담당: 
 @Service
 public class EventService {
 
