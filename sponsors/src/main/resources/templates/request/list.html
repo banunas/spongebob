@@ -4,7 +4,7 @@
 <body>
 <main>
     <h1>협찬목록</h1>
-    <p>커밋이 보낸 협찬 요청 내역</p>
+    <p>우리 단체가 보낸 협찬 요청 내역</p>
     <p><a href="/requests/new">+ 협찬 요청하기</a></p>
 
     <table th:if="${!#lists.isEmpty(requests)}">
@@ -16,11 +16,12 @@
                 <th>수량</th>
                 <th>협찬상태</th>
                 <th>후기</th>
+                <th>관리</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="r : ${requests}">
-                <td>커밋</td>
+                <td th:text="${r.orgName}">이화여대 컴퓨터공학과 학생회</td>
                 <td th:text="${r.companyName}">도미노피자</td>
                 <td th:text="${r.eventName}">봄 대동제</td>
                 <td th:text="${r.quantity}">20</td>
@@ -28,17 +29,28 @@
                     <span th:switch="${r.status}">
                         <span th:case="null">대기중</span>
                         <span th:case="'PENDING'">대기중</span>
-                        <span th:case="'ACCEPTED'">승인</span>
+                        <span th:case="'APPROVED'">승인</span>
                         <span th:case="'REJECTED'">거절</span>
                         <span th:case="'DONE'">완료</span>
                         <span th:case="'REVIEWED'">후기완료</span>
                     </span>
                 </td>
                 <td>
-                    <a th:if="${r.status == 'ACCEPTED' or r.status == 'DONE'}"
+                    <a th:if="${r.status == 'APPROVED' or r.status == 'DONE'}"
                        th:href="@{/reviews/new(requestId=${r.requestId})}">후기작성</a>
                     <span th:if="${r.status == 'REVIEWED'}">작성완료</span>
-                    <span th:if="${r.status == 'PENDING' or r.status == null or r.status == 'APPROVED'}">-</span>
+                    <span th:if="${r.status == 'PENDING' or r.status == null or r.status == 'REJECTED'}">-</span>
+                </td>
+                <td>
+                    <!-- 대기중(PENDING)인 요청만 수정/삭제 가능 -->
+                    <span th:if="${r.status == 'PENDING' or r.status == null}">
+                        <a th:href="@{/requests/{id}/edit(id=${r.requestId})}">수정</a>
+                        <form th:action="@{/requests/{id}/delete(id=${r.requestId})}" method="post"
+                              style="display:inline;" onsubmit="return confirm('정말 삭제할까요?');">
+                            <button type="submit">삭제</button>
+                        </form>
+                    </span>
+                    <span th:unless="${r.status == 'PENDING' or r.status == null}">-</span>
                 </td>
             </tr>
         </tbody>

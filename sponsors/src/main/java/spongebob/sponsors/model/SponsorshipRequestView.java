@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 @Data
 public class SponsorshipRequestView {
     private int requestId;
+    private int orgId;
+    private String orgName;
     private int eventId;
     private String eventName;
     private int companyId;

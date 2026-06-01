@@ -3,7 +3,7 @@
       th:replace="~{layout :: layout('협찬요청', 'request-new', ~{::main})}">
 <body>
 <main>
-    <h1>협찬 요청</h1>
+    <h1 th:text="${request.requestId != null} ? '협찬 요청 수정' : '협찬 요청'">협찬 요청</h1>
     <p style="color:#555;">행사와 기업을 선택해 협찬을 요청하세요.</p>
 
     <!-- 에러 메시지 -->
@@ -12,7 +12,8 @@
         <strong>오류:</strong> <span th:text="${errorMessage}"></span>
     </div>
 
-    <form th:action="@{/requests}" th:object="${request}" method="post"
+    <form th:action="${request.requestId != null} ? @{/requests/{id}(id=${request.requestId})} : @{/requests}"
+          th:object="${request}" method="post"
           style="max-width:480px;">
 
         <table style="border:none; width:100%;">
@@ -24,7 +25,7 @@
                 <tr>
                     <th style="border:none; padding:10px 0; font-weight:600;">학생단체</th>
                     <td style="border:none; padding:10px 0;">
-                        <input type="text" value="이화여대 컴퓨터공학과 학생회 (커밋)"
+                        <input type="text" value="이화여대 컴퓨터공학과 학생회"
                                disabled style="width:100%; padding:6px 8px; border:1px solid #ccc; border-radius:4px; background:#f5f5f5; color:#555;">
                     </td>
                 </tr>
@@ -65,6 +66,7 @@
 
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button type="submit"
+                    th:text="${request.requestId != null} ? '수정하기' : '요청하기'"
                     style="background:#1d7923; color:white; border:none; padding:8px 20px; border-radius:4px; cursor:pointer; font-size:14px;">
                 요청하기
             </button>

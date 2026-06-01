@@ -24,7 +24,7 @@ public class CompanyController {
 
     @PostMapping("/requests/{id}/accept")
     public String accept(@PathVariable Long id) {
-        companyService.updateRequestStatus(id, "ACCEPTED", 1L);
+        companyService.updateRequestStatus(id, "APPROVED", 1L);
         return "redirect:/company/requests";
     }
 
