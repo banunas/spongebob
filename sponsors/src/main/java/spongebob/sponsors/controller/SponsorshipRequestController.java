@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,5 +68,35 @@ public class SponsorshipRequestController {
             redirectAttributes.addFlashAttribute("errorMessage", "이미 해당 기업에 요청한 행사입니다.");
             return "redirect:/requests/new";
         }
+    }
+
+    // 협찬요청 수정 폼 화면
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        model.addAttribute("request", sponsorshipService.getRequest(id));
+        model.addAttribute("events", eventService.getEventsForCurrentOrg());
+        model.addAttribute("companies", companyRepository.findAll());
+        return "request/form";
+    }
+
+    // 협찬요청 수정 처리
+    @PostMapping("/{id}")
+    public String update(@PathVariable Long id, @ModelAttribute SponsorshipRequest request,
+                         RedirectAttributes redirectAttributes) {
+        try {
+            request.setRequestId(id.intValue());
+            sponsorshipService.updateRequest(request);
+            return "redirect:/requests";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "수정 중 오류가 발생했습니다.");
+            return "redirect:/requests/" + id + "/edit";
+        }
+    }
+
+    // 협찬요청 삭제 처리
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        sponsorshipService.deleteRequest(id);
+        return "redirect:/requests";
     }
 }
