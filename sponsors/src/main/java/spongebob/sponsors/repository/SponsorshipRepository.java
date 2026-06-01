@@ -46,9 +46,30 @@ public class SponsorshipRepository {
                 request.getQuantity());
     }
 
-    // 협찬요청 단건 status 조회
-    public String findStatusById(int requestId) {
-        String sql = "SELECT status FROM sponsorship_request WHERE request_id = ?";
-        return jdbcTemplate.queryForObject(sql, String.class, requestId);
+    // 전체 협찬요청 목록 조회 (기업 관리 페이지용)
+    public List<SponsorshipRequestView> findAll() {
+        String sql = """
+                SELECT sr.request_id,
+                       sr.event_id,    e.event_name,
+                       sr.company_id,  c.company_name,
+                       sr.status, sr.quantity, sr.created_at
+                FROM sponsorship_request sr
+                JOIN event   e ON sr.event_id   = e.event_id
+                JOIN company c ON sr.company_id = c.company_id
+                ORDER BY sr.created_at DESC
+                """;
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SponsorshipRequestView.class));
+    }
+
+    // 협찬요청 단건 조회
+    public SponsorshipRequest findById(Long requestId) {
+        String sql = "SELECT request_id, event_id, company_id, status, quantity, created_at FROM sponsorship_request WHERE request_id = ?";
+        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(SponsorshipRequest.class), requestId);
+    }
+
+    // 협찬요청 상태 업데이트
+    public void update(SponsorshipRequest request) {
+        String sql = "UPDATE sponsorship_request SET status = ? WHERE request_id = ?";
+        jdbcTemplate.update(sql, request.getStatus(), request.getRequestId());
     }
 }

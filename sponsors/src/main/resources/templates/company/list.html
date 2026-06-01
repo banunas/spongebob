@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('기업 협찬 요청 관리', 'company', ~{::main})}">
+<body>
+<main>
+    <h1>기업 협찬 요청 관리</h1>
+    <p style="color:#555;">비밀번호를 입력하면 해당 기업의 승인/거절 버튼이 활성화됩니다.</p>
+
+    <div th:if="${errorMessage}"
+         style="background:#fff3cd; border:1px solid #ffc107; border-radius:4px; padding:10px 14px; margin-bottom:16px; color:#856404;">
+        <strong>오류:</strong> <span th:text="${errorMessage}"></span>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(requests)}">
+        <thead>
+            <tr>
+                <th>기업명</th>
+                <th>행사명</th>
+                <th>수량</th>
+                <th>신청일</th>
+                <th>상태</th>
+                <th>인증</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="r : ${requests}" th:data-company-id="${r.companyId}">
+                <td th:text="${r.companyName}">도미노피자</td>
+                <td th:text="${r.eventName}">봄 대동제</td>
+                <td th:text="${r.quantity}">20</td>
+                <td th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}">2025-01-01</td>
+                <td>
+                    <span th:switch="${r.status}">
+                        <span th:case="'PENDING'">대기중</span>
+                        <span th:case="'APPROVED'">승인</span>
+                        <span th:case="'REJECTED'">거절</span>
+                        <span th:case="'DONE'">완료</span>
+                        <span th:case="'REVIEWED'">후기완료</span>
+                        <span th:case="*">대기중</span>
+                    </span>
+                </td>
+
+                <!-- 비밀번호 입력 (PENDING 상태만) -->
+                <td>
+                    <span th:if="${r.status == 'PENDING' or r.status == null}"
+                          style="display:flex; align-items:center; gap:6px;">
+                        <input type="password" class="pw-input"
+                               placeholder="비밀번호"
+                               style="width:90px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;">
+                        <button type="button" onclick="doAuth(this)"
+                                style="padding:3px 10px; border:1px solid #555; border-radius:4px; cursor:pointer; background:white;">
+                            입력
+                        </button>
+                        <span class="auth-status" style="font-weight:700; min-width:28px;"></span>
+                    </span>
+                    <span th:unless="${r.status == 'PENDING' or r.status == null}" style="color:#aaa;">-</span>
+                </td>
+
+                <!-- 승인/거절 버튼 (초기: disabled) -->
+                <td>
+                    <span th:if="${r.status == 'PENDING' or r.status == null}">
+                        <button type="button" class="action-btn" disabled
+                                th:data-action="@{/company/requests/{id}/accept(id=${r.requestId})}"
+                                th:data-label="|${r.companyName} — ${r.eventName} 협찬 요청을 승인하시겠습니까?|"
+                                onclick="openModal(this, 'accept')"
+                                style="background:#1d7923; color:white; border:none;
+                                       padding:4px 10px; border-radius:4px; cursor:pointer;">
+                            승인
+                        </button>
+                        <button type="button" class="action-btn" disabled
+                                th:data-action="@{/company/requests/{id}/reject(id=${r.requestId})}"
+                                th:data-label="|${r.companyName} — ${r.eventName} 협찬 요청을 거절하시겠습니까?|"
+                                onclick="openModal(this, 'reject')"
+                                style="background:white; color:#c0392b; border:1px solid #c0392b;
+                                       padding:4px 10px; border-radius:4px; cursor:pointer;">
+                            거절
+                        </button>
+                    </span>
+                    <span th:unless="${r.status == 'PENDING' or r.status == null}"
+                          style="color:#aaa;">처리완료</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(requests)}" style="color:#888;">협찬 요청이 없습니다.</p>
+    <p style="margin-top:20px;"><a href="/">메인으로 돌아가기</a></p>
+
+    <!-- 확인 팝업 모달 -->
+    <div id="modal-overlay" style="position:fixed; inset:0;
+         background:rgba(0,0,0,0.4); z-index:100; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:8px; padding:28px 32px;
+                    min-width:320px; box-shadow:0 4px 20px rgba(0,0,0,0.2); text-align:center;">
+            <p id="modal-message" style="margin:0 0 20px; font-size:15px; line-height:1.5;"></p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="modal-confirm" onclick="confirmAction()"
+                        style="padding:7px 24px; border:none; border-radius:4px;
+                               color:white; font-size:14px; cursor:pointer;">
+                    확인
+                </button>
+                <button onclick="closeModal()"
+                        style="padding:7px 24px; border:1px solid #ccc; border-radius:4px;
+                               background:white; font-size:14px; cursor:pointer;">
+                    취소
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 숨겨진 form (모달 확인 후 submit) -->
+    <form id="action-form" method="post" style="display:none;">
+        <input type="hidden" id="form-company-id" name="companyId" value="">
+    </form>
+
+<style>
+    .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .action-btn:not(:disabled) { opacity: 1; cursor: pointer; }
+</style>
+
+<script>
+let pendingAction = null;
+let pendingType = null;
+
+// 초기 숨김 처리 (인라인 style 대신 JS로 제어해야 나중에 덮어쓸 수 있음)
+document.getElementById('modal-overlay').style.display = 'none';
+
+function openModal(button, type) {
+    pendingAction = button.dataset.action;
+    pendingType = type;
+
+    // 해당 행의 companyId를 form hidden field에 세팅
+    const companyId = button.closest('tr').dataset.companyId;
+    document.getElementById('form-company-id').value = companyId;
+
+    document.getElementById('modal-message').textContent = button.dataset.label;
+
+    const confirmBtn = document.getElementById('modal-confirm');
+    if (type === 'accept') {
+        confirmBtn.style.background = '#1d7923';
+        confirmBtn.textContent = '승인';
+    } else {
+        confirmBtn.style.background = '#c0392b';
+        confirmBtn.textContent = '거절';
+    }
+
+    document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    pendingAction = null;
+    pendingType = null;
+}
+
+function confirmAction() {
+    if (!pendingAction) return;
+    const form = document.getElementById('action-form');
+    form.action = pendingAction;
+    form.submit();
+}
+
+async function doAuth(button) {
+    const row = button.closest('tr');
+    const companyId = row.dataset.companyId;
+    const password = row.querySelector('.pw-input').value;
+    const statusSpan = row.querySelector('.auth-status');
+
+    if (!password) return;
+
+    const response = await fetch('/company/auth-json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'password=' + encodeURIComponent(password)
+    });
+    const data = await response.json();
+
+    if (data.success) {
+        statusSpan.textContent = '확인';
+        statusSpan.style.color = '#1d7923';
+        document.querySelectorAll('tr[data-company-id="' + companyId + '"]').forEach(function(r) {
+            r.querySelectorAll('.action-btn').forEach(function(btn) {
+                btn.disabled = false;
+            });
+        });
+    } else {
+        statusSpan.textContent = '거절';
+        statusSpan.style.color = 'red';
+    }
+}
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
+</main>
+</body>
+</html>

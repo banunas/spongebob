@@ -21,4 +21,10 @@ public class CompanyRepository {
                      "FROM company ORDER BY company_name";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Company.class));
     }
+
+    public Company findByPassword(String password) {
+        String sql = "SELECT company_id, company_name, product_name, contact FROM company WHERE password = ?";
+        List<Company> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Company.class), password);
+        return list.isEmpty() ? null : list.get(0);
+    }
 }
