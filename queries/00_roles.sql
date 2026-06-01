@@ -1,8 +1,5 @@
 -- =====================================================
---  협찬 매칭 시스템 - DCL (권한 설정)
---  팀: 스폰지밥
---  날짜: 2026-05-18
---  실행 순서: 00_schema.sql → 00_seed.sql → 이 파일
+--  데이터 보안 DCL 추가 (서아 6/1)
 -- =====================================================
 
 USE sponsors;
@@ -56,3 +53,7 @@ GRANT SELECT ON sponsors.* TO 'readonly_user'@'localhost';
 --  권한 적용
 -- =====================================================
 FLUSH PRIVILEGES;
+
+-- 권한 확인
+-- SHOW GRANTS FOR 'student_user'@'localhost';
+-- SHOW GRANTS FOR 'company_user'@'localhost';

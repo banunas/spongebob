@@ -8,7 +8,7 @@ import spongebob.sponsors.repository.StatsRepository;
 
 import java.util.List;
 
-// 담당: 전원
+// 담당: 서아
 @Controller
 @RequestMapping("/stats")
 public class StatsController {
@@ -27,6 +27,8 @@ public class StatsController {
         model.addAttribute("reliability",    nullToEmpty(statsRepository.findReliabilityTop5()));
         model.addAttribute("recommendation", nullToEmpty(statsRepository.findCompanyRecommendation()));
         model.addAttribute("successRate",    nullToEmpty(statsRepository.findSuccessRate()));
+        model.addAttribute("ratingDistribution",   nullToEmpty(statsRepository.findRatingDistribution()));
+        model.addAttribute("reviewCountFiltering",  nullToEmpty(statsRepository.findCompaniesReviewCountFiltering()));
         return "stats/index";
     }
 

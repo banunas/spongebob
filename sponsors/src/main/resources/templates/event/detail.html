@@ -3,38 +3,32 @@
       th:replace="~{layout :: layout('행사 상세', 'event', ~{::main})}">
 <body>
 <main>
-    <div class="toolbar">
-        <h1 class="page-title" th:text="${event.eventName}">봄 대동제</h1>
-        <a href="/events" class="btn btn-outline">목록으로</a>
-    </div>
+    <h1 th:text="${event.eventName}">봄 대동제</h1>
+    <p><a href="/events">← 목록으로</a></p>
 
-    <div class="card">
-        <table class="table detail-table">
-            <tr>
-                <th>날짜</th>
-                <td th:text="${event.eventDate}">2026-03-21</td>
-            </tr>
-            <tr>
-                <th>장소</th>
-                <td th:text="${event.venue}">운동장</td>
-            </tr>
-            <tr>
-                <th>예상 참여 인원</th>
-                <td th:text="${event.expectedAttendees} + '명'">1000명</td>
-            </tr>
-        </table>
+    <table>
+        <tr>
+            <th>날짜</th>
+            <td th:text="${event.eventDate}">2026-03-21</td>
+        </tr>
+        <tr>
+            <th>장소</th>
+            <td th:text="${event.venue}">운동장</td>
+        </tr>
+        <tr>
+            <th>예상 참여 인원</th>
+            <td th:text="${event.expectedAttendees} + '명'">1000명</td>
+        </tr>
+    </table>
 
         <div class="form-actions">
             <a th:href="@{/requests/new(eventId=${event.eventId})}" class="btn">이 행사에 협찬 요청하기</a>
+            <a th:href="@{/events/{id}/edit(id=${event.eventId})}" class="btn btn-outline">수정</a>
+            <form th:action="@{/events/{id}/delete(id=${event.eventId})}" method="post"
+                  onsubmit="return confirm('이 행사를 삭제하시겠습니까?')">
+                <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
         </div>
-    </div>
 </main>
-
-<style>
-.detail-table th {
-    width: 160px;
-    background: var(--bg);
-}
-</style>
 </body>
 </html>

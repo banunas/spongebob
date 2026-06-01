@@ -17,8 +17,7 @@ public class CompanyRepository {
     }
 
     public List<Company> findAll() {
-        String sql = "SELECT company_id, company_name, product_name, contact, password " +
-                     "FROM company ORDER BY company_name";
+        String sql = "SELECT company_id, company_name, product_name, contact FROM company ORDER BY company_name";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Company.class));
     }
 

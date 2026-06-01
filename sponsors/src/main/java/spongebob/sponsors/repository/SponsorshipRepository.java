@@ -22,12 +22,14 @@ public class SponsorshipRepository {
     public List<SponsorshipRequestView> findByOrgId(int orgId) {
         String sql = """
                 SELECT sr.request_id,
+                       e.org_id,       so.org_name,
                        sr.event_id,    e.event_name,
                        sr.company_id,  c.company_name,
                        sr.status, sr.quantity, sr.created_at
                 FROM sponsorship_request sr
-                JOIN event   e ON sr.event_id   = e.event_id
-                JOIN company c ON sr.company_id = c.company_id
+                JOIN event       e  ON sr.event_id   = e.event_id
+                JOIN student_org so ON e.org_id      = so.org_id
+                JOIN company     c  ON sr.company_id = c.company_id
                 WHERE e.org_id = ?
                 ORDER BY sr.created_at DESC
                 """;
@@ -44,6 +46,24 @@ public class SponsorshipRepository {
                 request.getEventId(),
                 request.getCompanyId(),
                 request.getQuantity());
+    }
+
+    // 기업 ID로 요청 목록 조회
+    public List<SponsorshipRequestView> findByCompanyId(Long companyId) {
+        String sql = """
+                SELECT sr.request_id,
+                    e.org_id,       so.org_name,
+                    sr.event_id,    e.event_name,
+                    sr.company_id,  c.company_name,
+                    sr.status, sr.quantity, sr.created_at
+                FROM sponsorship_request sr
+                JOIN event       e  ON sr.event_id   = e.event_id
+                JOIN student_org so ON e.org_id      = so.org_id
+                JOIN company     c  ON sr.company_id = c.company_id
+                WHERE sr.company_id = ?
+                ORDER BY sr.created_at DESC
+                """;
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(SponsorshipRequestView.class), companyId);
     }
 
     // 전체 협찬요청 목록 조회 (기업 관리 페이지용)
@@ -71,5 +91,21 @@ public class SponsorshipRepository {
     public void update(SponsorshipRequest request) {
         String sql = "UPDATE sponsorship_request SET status = ? WHERE request_id = ?";
         jdbcTemplate.update(sql, request.getStatus(), request.getRequestId());
+    }
+
+    // 협찬요청 내용 수정 (행사·기업·수량) — 학생단체용
+    public void updateContent(SponsorshipRequest request) {
+        String sql = "UPDATE sponsorship_request SET event_id = ?, company_id = ?, quantity = ? WHERE request_id = ?";
+        jdbcTemplate.update(sql,
+                request.getEventId(),
+                request.getCompanyId(),
+                request.getQuantity(),
+                request.getRequestId());
+    }
+
+    // 협찬요청 삭제
+    public void delete(Long requestId) {
+        String sql = "DELETE FROM sponsorship_request WHERE request_id = ?";
+        jdbcTemplate.update(sql, requestId);
     }
 }

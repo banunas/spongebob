@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import spongebob.sponsors.model.Event;
 import spongebob.sponsors.service.EventService;
 
-// 담당: 아영
+// 담당: 
 @Controller
 @RequestMapping("/events")
 public class EventController {
@@ -39,5 +39,23 @@ public class EventController {
     public String detail(@PathVariable int id, Model model) {
         model.addAttribute("event", eventService.getEventById(id));
         return "event/detail";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable int id, Model model) {
+        model.addAttribute("event", eventService.getEventById(id));
+        return "event/form";
+    }
+
+    @PostMapping("/{id}")
+    public String update(@PathVariable int id, @ModelAttribute Event event) {
+        eventService.updateEvent(id, event);
+        return "redirect:/events/" + id;
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable int id) {
+        eventService.deleteEvent(id);
+        return "redirect:/events";
     }
 }

@@ -27,6 +27,24 @@ public class SponsorshipService {
 
     // 협찬요청 등록
     public void register(SponsorshipRequest request) {
+        // 저장하기 전에 상태를 "PENDING"으로 강제 설정!
+        request.setStatus("PENDING");
         sponsorshipRepository.save(request);
     }
+
+    // 협찬요청 단건 조회 (수정 폼용)
+    public SponsorshipRequest getRequest(Long requestId) {
+        return sponsorshipRepository.findById(requestId);
+    }
+
+    // 협찬요청 수정 (행사·기업·수량)
+    public void updateRequest(SponsorshipRequest request) {
+        sponsorshipRepository.updateContent(request);
+    }
+
+    // 협찬요청 삭제
+    public void deleteRequest(Long requestId) {
+        sponsorshipRepository.delete(requestId);
+    }
+
 }
