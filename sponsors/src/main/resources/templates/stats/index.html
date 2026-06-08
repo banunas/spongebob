@@ -27,12 +27,13 @@
     <h2>2. 월별 협찬 건수 추이</h2>
     <table th:if="${!#lists.isEmpty(monthly)}">
         <thead>
-            <tr><th>월</th><th>협찬 건수</th></tr>
+            <tr><th>월</th><th>협찬 건수</th><th>추이</th></tr>
         </thead>
         <tbody>
             <tr th:each="row : ${monthly}">
                 <td th:text="${row.get('월')}">2026-01</td>
                 <td th:text="${row.get('협찬 건수')}">10</td>
+                <td th:text="${row.get('추이')}">***</td>
             </tr>
         </tbody>
     </table>
@@ -48,7 +49,7 @@
                 <td th:text="${row.get('월')}">2026-01</td>
                 <td th:text="${row.get('이번달_건수')}">10</td>
                 <td th:text="${row.get('전월_건수')}">8</td>
-                <td th:text="${row.get('건수 차이')}">2</td>
+                <td th:text="${row.get('건수_차이')}">2</td>
                 <td th:text="${row.get('증감률') != null ? row.get('증감률') + '%' : '-'}">25%</td>
             </tr>
         </tbody>
