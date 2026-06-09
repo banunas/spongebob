@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오류 발생</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; line-height: 1.6; }
+        .error-card { border: 1px solid #ffe3e3; background: #fff5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto; color: #d63301; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <h2>오류가 발생했습니다</h2>
+    <p>요청을 처리하는 중에 문제가 발생했습니다. 서버 로그나 아래 상세 내용을 확인하세요.</p>
+    
+    <div class="error-card">
+        <strong>발생 예외 메시지:</strong>
+        <pre th:text="${message != null ? message : (exception != null ? exception.message : '상세 에러 메시지가 없습니다.')}">오류 메시지</pre>
+    </div>
+    
+    <a href="/">홈으로 돌아가기</a>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('홈', 'home', ~{::main})}">
+<body>
+<main>
+    <h1>협찬 통합 관리 시스템</h1>
+    <p>안녕하세요, 이화여대 컴퓨터공학과 학생회님!</p>
+
+    <ul>
+        <li><a href="/requests/new">협찬요청</a></li>
+        <li><a href="/requests">협찬목록</a></li>
+        <li><a href="/events/new">행사등록</a></li>
+        <li><a href="/events">행사목록</a></li>
+        <li><a href="/company/requests">기업 협찬 관리 (기업 입장)</a></li>
+        <li><a href="/stats">통계</a></li>
+    </ul>
+</main>
+</body>
+</html>

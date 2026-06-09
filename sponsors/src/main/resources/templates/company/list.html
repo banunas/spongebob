@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('기업 협찬 요청 관리', 'company', ~{::main})}">
+<body>
+<main>
+    <h1>기업 협찬 요청 관리</h1>
+    <p>우리 기업에 들어온 협찬 요청 목록입니다. 내용을 확인하고 승인 또는 거절을 선택하세요.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>요청 ID</th>
+                <th>행사명</th>
+                <th>요청 수량</th>
+                <th>신청 일자</th>
+                <th>현재 상태</th>
+                <th>관리 액션</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="request : ${requests}">
+                <td th:text="${request.requestId}">1</td>
+                <td th:text="${request.eventName}">여름 축제</td>
+                <td th:text="${request.quantity}">100</td>
+                <td th:text="${#temporals.format(request.createdAt, 'yyyy-MM-dd')}">2023-10-27</td>
+                <td th:text="${request.status == null ? 'PENDING' : request.status}">PENDING</td>
+                <td>
+                    <span th:if="${request.status == null or request.status == 'PENDING'}">
+                        <form th:action="@{/company/requests/{id}/accept(id=${request.requestId})}" method="post" style="display:inline;">
+                            <button type="submit">승인</button>
+                        </form>
+                        <form th:action="@{/company/requests/{id}/reject(id=${request.requestId})}" method="post" style="display:inline;">
+                            <button type="submit">거절</button>
+                        </form>
+                    </span>
+                    <span th:if="${request.status != null and request.status != 'PENDING'}">- 처리 완료 -</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="6">들어온 협찬 요청이 없습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><a href="/">메인으로 돌아가기</a></p>
+</main>
+</body>
+</html>

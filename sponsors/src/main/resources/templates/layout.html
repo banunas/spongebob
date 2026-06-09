@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(title, active, content)">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title} + ' | 협찬 통합 관리 시스템'">협찬 통합 관리 시스템</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+            color: black;
+            background: white;
+        }
+        a { color: #1d7923; }
+        table { border-collapse: collapse; margin: 12px 0; }
+        th, td { border: 1px solid black; padding: 6px 12px; text-align: left; }
+        nav a { margin-right: 14px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">홈</a>
+        <a href="/requests/new">협찬요청</a>
+        <a href="/requests">협찬목록</a>
+        <a href="/events/new">행사등록</a>
+        <a href="/events">행사목록</a>
+        <a href="/company/requests">기업 협찬 관리</a>
+        <a href="/stats">통계</a>
+    </nav>
+
+    <div th:replace="${content}"></div>
+</body>
+</html>
